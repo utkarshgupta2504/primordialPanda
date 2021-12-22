@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from discord import colour
 from discord.ext import commands
 import discord
 import typing
@@ -8,8 +9,8 @@ import json
 from constants import levelsDict
 
 
-class ExperienceCog(commands.Cog):
-    """The description for ExperienceCog goes here."""
+class Experience(commands.Cog):
+    """The description for Experience goes here."""
 
     def __init__(self, bot: commands.Bot):
         self.bot = bot
@@ -74,8 +75,17 @@ class ExperienceCog(commands.Cog):
 
                 if newLevel != -1:
 
+                    levelUpEmbed = discord.Embed(
+                        title="Level Up!",
+                        description=f"🏅Congratulations {message.author.mention}! The Primordial Panda recognizes your hard work and has blessed you! You are now level {newLevel}!🏅",
+                        colour=0xE7841B,
+                    )
+
+                    levelUpEmbed.set_footer(text="Mystical Forest")
+                    levelUpEmbed.set_thumbnail(url=message.author.avatar_url)
+
                     await self.bot.get_channel(912392441670291527).send(
-                        f"🏅Congratulations {message.author.mention}! You have reached level {newLevel}! Now go forth and become stronger🏅"
+                        embed=levelUpEmbed
                     )
 
     @commands.command(name="addXP", aliases=["giveXP"])
@@ -88,12 +98,19 @@ class ExperienceCog(commands.Cog):
 
         if newLevel != -1:
 
-            self.bot.get_channel(912392441670291527).send(
-                f"🏅Congratulations {user.mention}! You have reached level {newLevel}! Now go forth and become stronger🏅"
+            levelUpEmbed = discord.Embed(
+                title="Level Up!",
+                description=f"🏅Congratulations {user.mention}! The Primordial Panda recognizes your hard work and has blessed you! You are now level {newLevel}!🏅",
+                colour=0xE7841B,
             )
+
+            levelUpEmbed.set_footer(text="Mystical Forest")
+            levelUpEmbed.set_thumbnail(url=user.avatar_url)
+
+            await self.bot.get_channel(912392441670291527).send(embed=levelUpEmbed)
 
         await ctx.send(f"Added {xp} experience to {user.mention}!")
 
 
 def setup(bot):
-    bot.add_cog(ExperienceCog(bot))
+    bot.add_cog(Experience(bot))

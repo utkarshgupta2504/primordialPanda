@@ -4,8 +4,8 @@ from discord.ext import commands
 import discord
 
 
-class TriggersCog(commands.Cog):
-    """The description for TriggersCog goes here."""
+class Triggers(commands.Cog):
+    """The description for Triggers goes here."""
 
     def __init__(self, bot):
         self.bot = bot
@@ -31,4 +31,4 @@ class TriggersCog(commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(TriggersCog(bot))
+    bot.add_cog(Triggers(bot))

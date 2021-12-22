@@ -7,7 +7,8 @@ load_dotenv()
 
 bot = commands.Bot(command_prefix="?")
 
-bot.load_extension("cogs.triggers")
+for i in next(os.walk(os.getcwd() + "/cogs"), (None, None, []))[2][::-1]:
+    bot.load_extension("cogs." + i[:-3])
 
 
 @bot.event

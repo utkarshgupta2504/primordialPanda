@@ -38,5 +38,11 @@ async def verify(ctx: commands.Context):
     await ctx.message.delete()
     await ctx.author.remove_roles(ctx.guild.get_role(911077094803537930))
 
+    await bot.get_channel(923016846863634442).send(
+        embed=discord.Embed(
+            description=f"As you finally make your way along the path to the meadow of the temple, a man approaches you. He looks gruff. Leisurely he glances at you then at a paper in your hand.\n\n\"Ah {ctx.author.mention}, there you are. Just in time for the morning session. If you're unsure what you should do, you could head to the {bot.get_channel(923016846863634442).mention} to meet and talk to other servants of the forest. Tell us about yourself by visiting the {bot.get_channel(912723730214563901).mention} channel. If you can't remember all the rules on the sign, you can find them in the {bot.get_channel(912196522433732618).mention} channel. If that isn't quite striking your fancy, look for the ones with red emblems just like I have on my shirt, they may be able to guide your way, as they are the direct subordinates of the pink hatted shrine priestess.\"\n\nHmm, you're looking a little green to get started right away, come see me when you're level 10. I hope you can find your peace here like I have, I quite like to spend my time alone in my {bot.get_channel(911630633036546058).mention}. Why don't you come tell me what you like once you get some experience. \""
+        )
+    )
+
 
 bot.run(os.environ["BOT_TOKEN"])

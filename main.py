@@ -3,9 +3,12 @@ from discord.ext import commands
 from dotenv import load_dotenv
 import os
 
+intents = discord.Intents.default()
+intents.members = True
+
 load_dotenv()
 
-bot = commands.Bot(command_prefix="?")
+bot = commands.Bot(command_prefix="?", intents=intents)
 
 for i in next(os.walk(os.getcwd() + "/cogs"), (None, None, []))[2][::-1]:
     bot.load_extension("cogs." + i[:-3])
@@ -14,6 +17,11 @@ for i in next(os.walk(os.getcwd() + "/cogs"), (None, None, []))[2][::-1]:
 @bot.event
 async def on_ready():
     print("We have logged in as {0.user}".format(bot))
+
+
+@bot.event
+async def on_member_join(member: discord.Member):
+    await member.add_roles(member.guild.get_role(911077094803537930))
 
 
 @bot.event

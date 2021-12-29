@@ -288,13 +288,13 @@ class Experience(commands.Cog):
 
         await ctx.send(f"Added {xp} experience to {user.mention}!")
 
-    @commands.command()
-    async def addXPLocal(self, ctx, user: discord.Member, xp: int):
+    # @commands.command()
+    # async def addXPLocal(self, ctx, user: discord.Member, xp: int):
 
-        await self.updateUserExperience(str(user.id), xp)
-        await self.checkUserLevelUp(ctx.message, user)
+    #     await self.updateUserExperience(str(user.id), xp)
+    #     await self.checkUserLevelUp(ctx.message, user)
 
-        await ctx.send(f"Added {xp} experience to {user.mention}!")
+    #     await ctx.send(f"Added {xp} experience to {user.mention}!")
 
 
 def setup(bot):

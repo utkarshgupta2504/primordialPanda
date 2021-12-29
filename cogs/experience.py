@@ -68,7 +68,7 @@ class Experience(commands.Cog):
 
                 embedsToSend.append(
                     discord.Embed(
-                        description=f"Ah, you've been working hard I see. I think it's time for you to become a more permanent member of the Forest. Please head to the {self.bot.get_channel(923646299797078096).mention} channel that I've opened for you to find your own way through my Mystical Forest, choose wisely as your choice is permanent. Good luck my servant",
+                        description=f"Ah, you've been working hard I see. I think it's time for you to become a more permanent member of the Forest. Please head to the {self.bot.get_channel(923646299797078096).mention} channel that I've opened for you to find your own way through my Mystical Forest, choose wisely as your choice is permanent. Good luck servant of the forest",
                         colour=0xE7841B,
                     ).set_footer(text="Mystical Forest")
                 )
@@ -105,7 +105,11 @@ class Experience(commands.Cog):
             await user.add_roles(*rolesToAdd)
 
             for e in embedsToSend:
-                await user.send(embed=e)
+                await user.send(
+                    embed=e.set_thumbnail(
+                        url="https://cdn.discordapp.com/emojis/925101102242865297.png?size=1024"
+                    )
+                )
 
             await self.bot.get_channel(912392441670291527).send(embed=levelUpEmbed)
 
@@ -249,8 +253,6 @@ class Experience(commands.Cog):
 
             json.dump(self.experience, f, indent=2)
 
-        await ctx.reply(response, delete_after=5)
-
         await self.bot.get_channel(925821155019980830).send(
             f"{ctx.author.mention} has chosen to walk along the **Path of the {path.capitalize()}**"
         )
@@ -258,6 +260,12 @@ class Experience(commands.Cog):
         await self.bot.get_channel(923016846863634442).send(
             f"{ctx.author.mention} now walks the **Path of the {path.capitalize()}**"
         )
+
+        await self.bot.get_channel(dormID[path.capitalize()]).send(
+            f"{ctx.author.mention} has joined our superior path, <@&{pathLevelRoles[path.capitalize()][0]}>, come welcome them!"
+        )
+
+        await ctx.reply(response, delete_after=5)
 
         await asyncio.sleep(5)
 

@@ -28,7 +28,7 @@ class Experience(commands.Cog):
 
     async def updateUserExperience(self, id, xp=1):
         if id not in self.experience:
-            self.experience[id] = {"xp": 0, "level": 0}
+            self.experience[id] = {"xp": 0, "level": 0, "path": None}
 
         self.experience[id]["xp"] += xp
 
@@ -37,7 +37,7 @@ class Experience(commands.Cog):
             json.dump(self.experience, f, indent=2)
 
     async def checkUserLevelUp(
-        self, message: discord.Message, user: discord.User = None
+        self, message: discord.Message, user: discord.Member = None
     ):
 
         if user is None:
@@ -55,17 +55,17 @@ class Experience(commands.Cog):
 
         embedDescription = f"🏅Congratulations {user.mention}! The Primordial Panda recognizes your hard work and has blessed you! You are now level <level>!🏅"
 
-        while currXp >= levelsDict[currLevel + 1]:
+        while (currLevel + 1) in levelsDict and currXp >= levelsDict[currLevel + 1]:
             currLevel += 1
             self.experience[id]["level"] += 1
 
             isLeveledUp = True
 
             if currLevel == 10:
-                await user.add_roles(get(message.guild.roles, id=923622800508465303))
+                rolesToAdd.append(get(message.guild.roles, id=923622800508465303))
 
-                await user.send(
-                    embed=discord.Embed(
+                embedsToSend.append(
+                    discord.Embed(
                         description=f"Ah, you've been working hard I see. I think it's time for you to become a more permanent member of the Forest. Please head to the {self.bot.get_channel(923646299797078096).mention} channel that I've opened for you to find your own way through my Mystical Forest, choose wisely as your choice is permanent. Good luck my servant",
                         colour=0xE7841B,
                     ).set_footer(text="Mystical Forest")
@@ -89,7 +89,18 @@ class Experience(commands.Cog):
                 .set_thumbnail(url=user.avatar_url)
             )
 
+            await user.add_roles(*rolesToAdd)
+
+            for e in embedsToSend:
+                await user.send(embed=e)
+
             await self.bot.get_channel(912392441670291527).send(embed=levelUpEmbed)
+
+    async def addPathRoles(self, level, roles, ctx: commands.Context):
+
+        for lvl in roles:
+            if level >= lvl:
+                await ctx.author.add_roles(ctx.guild.get_role(roles[lvl]))
 
     @commands.Cog.listener()
     async def on_ready(self):
@@ -112,9 +123,120 @@ class Experience(commands.Cog):
                 await self.updateUserExperience(str(message.author.id))
                 await self.checkUserLevelUp(message)
 
+    @commands.command(name="choosePath", aliases=["choosepath"])
+    async def choosePath(self, ctx: commands.Context, path: str = None):
+
+        if ctx.channel.id != 923646299797078096:
+            return
+
+        if (
+            ctx.guild.get_role(923622800508465303) not in ctx.author.roles
+            or self.experience[str(ctx.author.id)]["level"] < 10
+        ):
+            await ctx.reply("You cannot choose a path now!")
+            return
+
+        if path is None or path.lower() not in [
+            "overseer",
+            "architect",
+            "hermit",
+            "caregiver",
+            "ranger",
+        ]:
+            await ctx.reply(
+                "That is not a proper path, please select from Overseer | Architect | Hermit | Caregiver | Ranger"
+            )
+            return
+
+        path = path.lower()
+        currLevel = self.experience[str(ctx.author.id)]["level"]
+
+        if path == "overseer":
+
+            await self.addPathRoles(
+                currLevel,
+                {
+                    0: 923624607091658803,  # Path of The Overseer
+                    1: 923999016218406942,  # Apprentice of the Overseer
+                },
+                ctx,
+            )
+
+            self.experience[str(ctx.author.id)]["path"] = "Overseer"
+
+        elif path == "architect":
+
+            await self.addPathRoles(
+                currLevel,
+                {
+                    0: 923635122840940625,  # Path of The Architect
+                    1: 924008140205338664,  # Apprentice of the Architect
+                },
+                ctx,
+            )
+
+            self.experience[str(ctx.author.id)]["path"] = "Architect"
+
+        elif path == "hermit":
+
+            await self.addPathRoles(
+                currLevel,
+                {
+                    0: 923626226906701845,  # Path of The Hermit
+                    1: 924010222517891092,  # Apprentice of the Hermit
+                },
+                ctx,
+            )
+
+            self.experience[str(ctx.author.id)]["path"] = "Hermit"
+
+        elif path == "ranger":
+
+            await self.addPathRoles(
+                currLevel,
+                {
+                    0: 923633643761594459,  # Path of The Ranger
+                    1: 924009432344567848,  # Apprentice of the Ranger
+                },
+                ctx,
+            )
+
+            self.experience[str(ctx.author.id)]["path"] = "Ranger"
+
+        elif path == "caregiver":
+
+            await self.addPathRoles(
+                currLevel,
+                {
+                    0: 923633634160836619,  # Path of The Caregiver
+                    1: 924006409102827552,  # Apprentice of the Caregiver
+                },
+                ctx,
+            )
+
+            self.experience[str(ctx.author.id)]["path"] = "Caregiver"
+
+        response = f"You have successfully chosen the path of the {path.capitalize()}"
+
+        if currLevel > 19:
+            response += "\nOn choosing your path on a later stage, the primordial panda takes away your experience and exiles you to be the apprentice of the path you want to follow."
+
+            self.experience[str(ctx.author.id)]["xp"] = 6515
+            self.experience[str(ctx.author.id)]["level"] = 19
+
+        with open("database/experience.json", "w") as f:
+
+            json.dump(self.experience, f, indent=2)
+
+        await ctx.reply(response)
+
+        await ctx.author.remove_roles(ctx.guild.get_role(923622800508465303))
+
+        await ctx.message.delete()
+
     @commands.command(name="addXP", aliases=["giveXP"])
     @commands.has_any_role("Shrine Priestess", "Red Panda Priest")
-    async def addXP(self, ctx, user: discord.User, xp: int):
+    async def addXP(self, ctx, user: discord.Member, xp: int):
 
         await self.updateUserExperience(str(user.id), xp)
         await self.checkUserLevelUp(ctx.message, user)
@@ -122,7 +244,7 @@ class Experience(commands.Cog):
         await ctx.send(f"Added {xp} experience to {user.mention}!")
 
     # @commands.command()
-    # async def addXPLocal(self, ctx, user: discord.User, xp: int):
+    # async def addXPLocal(self, ctx, user: discord.Member, xp: int):
 
     #     await self.updateUserExperience(str(user.id), xp)
     #     await self.checkUserLevelUp(ctx.message, user)

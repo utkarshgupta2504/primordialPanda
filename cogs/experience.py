@@ -7,7 +7,7 @@ import discord
 import typing
 import json
 
-from constants import levelsDict
+from constants import *
 
 
 class Experience(commands.Cog):
@@ -28,7 +28,7 @@ class Experience(commands.Cog):
 
     async def updateUserExperience(self, id, xp=1):
         if id not in self.experience:
-            self.experience[id] = {"xp": 0, "level": 0, "path": None}
+            self.experience[id] = {"xp": 0, "level": 0}
 
         self.experience[id]["xp"] += xp
 
@@ -72,6 +72,17 @@ class Experience(commands.Cog):
                 )
 
                 embedDescription += f"\n\nYou have reached the first milestone! You may now participate in giveaways, polls, and pick your path in the {self.bot.get_channel(923646299797078096).mention} channel."
+
+            if currLevel > 19 and "path" in self.experience[id]:
+
+                if currLevel in pathLevelRoles[self.experience[id]["path"]]:
+
+                    rolesToAdd.append(
+                        get(
+                            message.guild.roles,
+                            id=pathLevelRoles[self.experience[id]["path"]][currLevel],
+                        )
+                    )
 
         if isLeveledUp:
 

@@ -255,6 +255,10 @@ class Experience(commands.Cog):
             f"{ctx.author.mention} has chosen to walk along the **Path of the {path.capitalize()}**"
         )
 
+        await self.bot.get_channel(923016846863634442).send(
+            f"{ctx.author.mention} now walks the **Path of the {path.capitalize()}**"
+        )
+
         await asyncio.sleep(5)
 
         await ctx.author.remove_roles(ctx.guild.get_role(923622800508465303))

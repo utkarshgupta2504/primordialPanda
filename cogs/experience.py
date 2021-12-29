@@ -140,6 +140,7 @@ class Experience(commands.Cog):
     async def choosePath(self, ctx: commands.Context, path: str = None):
 
         if ctx.channel.id != 923646299797078096:
+            await ctx.reply(".. but there is no one here, who are you talking to?")
             return
 
         if (

@@ -139,15 +139,22 @@ class Experience(commands.Cog):
     @commands.command(name="choosePath", aliases=["choosepath"])
     async def choosePath(self, ctx: commands.Context, path: str = None):
 
-        if ctx.channel.id != 923646299797078096:
-            await ctx.reply(".. but there is no one here, who are you talking to?")
+        if self.experience[str(ctx.author.id)]["level"] < 10:
+            await ctx.reply(
+                "You're still looking a little green, come see me at level 10"
+            )
             return
 
-        if (
-            ctx.guild.get_role(923622800508465303) not in ctx.author.roles
-            or self.experience[str(ctx.author.id)]["level"] < 10
-        ):
-            await ctx.reply("You cannot choose a path now!")
+        if ctx.guild.get_role(923622800508465303) not in ctx.author.roles:
+            await ctx.send(
+                f"{ctx.author.mention}, you are already on the **Path of the {self.experience[str(ctx.author.id)]['path']}**, this choice is __permanent__"
+            )
+            return
+
+        if ctx.channel.id != 923646299797078096:
+            await ctx.reply(
+                f".. but there is no one here, please see me in {self.bot.get_channel(923646299797078096).mention}"
+            )
             return
 
         if path is None or path.lower() not in [
@@ -281,13 +288,13 @@ class Experience(commands.Cog):
 
         await ctx.send(f"Added {xp} experience to {user.mention}!")
 
-    # @commands.command()
-    # async def addXPLocal(self, ctx, user: discord.Member, xp: int):
+    @commands.command()
+    async def addXPLocal(self, ctx, user: discord.Member, xp: int):
 
-    #     await self.updateUserExperience(str(user.id), xp)
-    #     await self.checkUserLevelUp(ctx.message, user)
+        await self.updateUserExperience(str(user.id), xp)
+        await self.checkUserLevelUp(ctx.message, user)
 
-    #     await ctx.send(f"Added {xp} experience to {user.mention}!")
+        await ctx.send(f"Added {xp} experience to {user.mention}!")
 
 
 def setup(bot):

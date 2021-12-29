@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import asyncio
 from os import name
 from discord import colour
 from discord.ext import commands
@@ -231,7 +232,7 @@ class Experience(commands.Cog):
         response = f"You have successfully chosen the path of the {path.capitalize()}"
 
         if currLevel > 19:
-            response += "\nOn choosing your path on a later stage, the primordial panda takes away your experience and exiles you to be the apprentice of the path you want to follow."
+            response += "\nBecause you chose your path at a later stage, the primordial panda takes away your experience to start at the begin of the path you've chosen to follow."
 
             self.experience[str(ctx.author.id)]["xp"] = 6515
             self.experience[str(ctx.author.id)]["level"] = 19
@@ -240,7 +241,9 @@ class Experience(commands.Cog):
 
             json.dump(self.experience, f, indent=2)
 
-        await ctx.reply(response)
+        await ctx.reply(response, delete_after=5)
+
+        await asyncio.sleep(5)
 
         await ctx.author.remove_roles(ctx.guild.get_role(923622800508465303))
 

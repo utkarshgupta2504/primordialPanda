@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from os import name
 from discord import colour
 from discord.ext import commands
 from discord.utils import get
@@ -244,6 +245,28 @@ class Experience(commands.Cog):
         await ctx.author.remove_roles(ctx.guild.get_role(923622800508465303))
 
         await ctx.message.delete()
+
+    @commands.command(name="rank", aliases=["level", "r", "lvl"])
+    async def rank(self, ctx: commands.Context, user: discord.Member = None):
+
+        if user is None:
+            user = ctx.author
+
+        userXP = self.experience[str(user.id)]
+
+        rankEmbed = (
+            discord.Embed(title=str(user), description="Your Experience Details")
+            .add_field(name="XP", value=f"{userXP['xp']}")
+            .add_field(name="Level", value=f"{userXP['level']}")
+            .add_field(
+                name="Path",
+                value=f"{'None' if 'path' not in userXP else userXP['path']}",
+            )
+            .set_footer(text="Mystical Forest")
+            .set_thumbnail(url=user.avatar_url)
+        )
+
+        await ctx.send(embed=rankEmbed)
 
     @commands.command(name="addXP", aliases=["giveXP"])
     @commands.has_any_role("Shrine Priestess", "Red Panda Priest")

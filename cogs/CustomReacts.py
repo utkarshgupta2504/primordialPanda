@@ -79,7 +79,7 @@ class CustomReacts(commands.Cog):
         with open("database/customReacts.json", "w") as f:
             json.dump(self.customReacts, f, indent=2)
 
-        await ctx.reply("Successfully added custom react!")
+        await ctx.reply("Successfully removed custom react!")
 
 
 def setup(bot):

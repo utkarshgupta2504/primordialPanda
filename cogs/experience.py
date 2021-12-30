@@ -57,9 +57,13 @@ class Experience(commands.Cog):
 
         embedDescription = f"🏅Congratulations {user.mention}! The Primordial Panda recognizes your hard work and has blessed you! You are now level <level>!🏅"
 
+        userXP = self.experience[id]
+
         while (currLevel + 1) in levelsDict and currXp >= levelsDict[currLevel + 1]:
             currLevel += 1
             self.experience[id]["level"] += 1
+
+            userXP = self.experience[id]
 
             isLeveledUp = True
 
@@ -73,7 +77,7 @@ class Experience(commands.Cog):
                     ).set_footer(text="Mystical Forest")
                 )
 
-                embedDescription += f"\n\nYou have reached the first milestone! You may now participate in giveaways, polls, and pick your path in the {self.bot.get_channel(923646299797078096).mention} channel."
+                embedDescription += f"\n\nThe Primordial Panda is pleased with your hard work! You have received, in addition to level 10, the following blessings: participate in giveaways, polls, and can pick your path in the {self.bot.get_channel(923646299797078096).mention} channel!"
 
             if currLevel > 19 and "path" in self.experience[id]:
 
@@ -85,6 +89,61 @@ class Experience(commands.Cog):
                             id=pathLevelRoles[self.experience[id]["path"]][currLevel],
                         )
                     )
+
+            if currLevel == 20:
+                if "path" in userXP:
+                    rolesToAdd.append(
+                        get(
+                            message.guild.roles,
+                            id=pathLevelRoles[userXP["path"]][20],
+                        )
+                    )
+
+                embedDescription += f"\n\nThe Primordial Panda is pleased with your hard work! You have received, in addition to level {currLevel}, the following blessings: choose a role color, change your nickname, receive OwO manual hunt rewards, and access solitary channels!"
+
+            if currLevel == 40:
+                if "path" in userXP:
+                    rolesToAdd.append(
+                        get(
+                            message.guild.roles,
+                            id=pathLevelRoles[userXP["path"]][40],
+                        )
+                    )
+
+                embedDescription += f"\n\nThe Primordial Panda is pleased with your hard work! You have received, in addition to level {currLevel}, the following blessings: choose from the level 40 role color list and have a ONE time use XP boost!"
+
+            if currLevel == 60:
+                if "path" in userXP:
+                    rolesToAdd.append(
+                        get(
+                            message.guild.roles,
+                            id=pathLevelRoles[userXP["path"]][60],
+                        )
+                    )
+
+                embedDescription += f"\n\nThe Primordial Panda is pleased with your hard work! You have received, in addition to level {currLevel}, the following blessings: A custom reaction!"
+
+            if currLevel == 80:
+                if "path" in userXP:
+                    rolesToAdd.append(
+                        get(
+                            message.guild.roles,
+                            id=pathLevelRoles[userXP["path"]][80],
+                        )
+                    )
+
+                embedDescription += f"\n\nThe Primordial Panda is pleased with your hard work! You have received, in addition to level {currLevel}, the following blessings: You're own channel!"
+
+            if currLevel == 100:
+                if "path" in userXP:
+                    rolesToAdd.append(
+                        get(
+                            message.guild.roles,
+                            id=pathLevelRoles[userXP["path"]][80],
+                        )
+                    )
+
+                embedDescription += f"\n\nThe Primordial Panda is pleased with your hard work! You have received, in addition to level {currLevel}, the following blessings: A custom command!"
 
         if isLeveledUp:
 
@@ -286,9 +345,15 @@ class Experience(commands.Cog):
         userXP = self.experience[str(user.id)]
 
         rankEmbed = (
-            discord.Embed(title=str(user), description="Your Experience Details")
-            .add_field(name="XP", value=f"{userXP['xp']}")
-            .add_field(name="Level", value=f"{userXP['level']}")
+            discord.Embed(
+                title=str(user), description="Your Experience Details", color=0xE7841B
+            )
+            .add_field(
+                name="XP",
+                value=f"{userXP['xp']}/{str(levelsDict[userXP['level']+1]) if (userXP['level']+1) in levelsDict else 'MAX'}",
+                inline=False,
+            )
+            .add_field(name="Level", value=f"{userXP['level']}", inline=False)
             .add_field(
                 name="Path",
                 value=f"{'None' if 'path' not in userXP else userXP['path']}",
@@ -308,13 +373,13 @@ class Experience(commands.Cog):
 
         await ctx.send(f"Added {xp} experience to {user.mention}!")
 
-    # @commands.command()
-    # async def addXPLocal(self, ctx, user: discord.Member, xp: int):
+    @commands.command()
+    async def addXPLocal(self, ctx, user: discord.Member, xp: int):
 
-    #     await self.updateUserExperience(str(user.id), xp)
-    #     await self.checkUserLevelUp(ctx.message, user)
+        await self.updateUserExperience(str(user.id), xp)
+        await self.checkUserLevelUp(ctx.message, user)
 
-    #     await ctx.send(f"Added {xp} experience to {user.mention}!")
+        await ctx.send(f"Added {xp} experience to {user.mention}!")
 
 
 def setup(bot):

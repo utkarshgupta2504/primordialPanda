@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import asyncio
-from os import name
+from os import environ
 from discord import colour
 from discord.ext import commands
 from discord.utils import get
@@ -111,7 +111,11 @@ class Experience(commands.Cog):
                     )
                 )
 
-            await self.bot.get_channel(912392441670291527).send(embed=levelUpEmbed)
+            if environ["BOT_ENV"] != "development":
+                await self.bot.get_channel(912392441670291527).send(embed=levelUpEmbed)
+
+            else:
+                await self.bot.get_channel(926136930066911314).send(embed=levelUpEmbed)
 
     async def addPathRoles(self, level, roles, ctx: commands.Context):
 
@@ -140,7 +144,7 @@ class Experience(commands.Cog):
                 await self.updateUserExperience(str(message.author.id))
                 await self.checkUserLevelUp(message)
 
-    @commands.command(name="choosePath", aliases=["choosepath"])
+    @commands.command(name="choosePath")
     async def choosePath(self, ctx: commands.Context, path: str = None):
 
         if self.experience[str(ctx.author.id)]["level"] < 10:

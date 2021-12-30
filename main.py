@@ -11,7 +11,7 @@ intents.members = True
 
 load_dotenv()
 
-bot = commands.Bot(command_prefix="?", intents=intents)
+bot = commands.Bot(command_prefix="?", intents=intents, case_insensitive=True)
 
 for i in next(os.walk(os.getcwd() + "/cogs"), (None, None, []))[2][::-1]:
     bot.load_extension("cogs." + i[:-3])

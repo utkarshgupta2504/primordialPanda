@@ -72,7 +72,7 @@ class Experience(commands.Cog):
 
                 embedsToSend.append(
                     discord.Embed(
-                        description=f"Ah, you've been working hard I see. I think it's time for you to become a more permanent member of the Forest. Please head to the {self.bot.get_channel(923646299797078096).mention} channel that I've opened for you to find your own way through my Mystical Forest, choose wisely as your choice is permanent. Good luck servant of the forest",
+                        description=f"Ah, you've been working hard I see. I think it's time for you to become a more permanent member of the Forest. Please head to the {self.bot.get_channel(923646299797078096).mention} channel that has been opened for you to find your own way through the Mystical Forest, choose wisely as your choice is **__permanent__**. Good luck servant of the forest",
                         colour=0xE7841B,
                     ).set_footer(text="Mystical Forest")
                 )

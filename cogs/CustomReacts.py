@@ -70,7 +70,7 @@ class CustomReacts(commands.Cog):
             return
 
         if trigger in self.customReacts:
-            self.customReacts.popitem(trigger)
+            self.customReacts.pop(trigger)
 
         else:
             await ctx.reply("No such trigger!")

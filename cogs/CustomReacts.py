@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 
+from typing import Union
 from discord.ext import commands
 import discord
 import json
+import emoji
 
 from discord.utils import get
 
@@ -39,7 +41,10 @@ class CustomReacts(commands.Cog):
         "Shrine Priestess", "Red Panda Priest", "Ninja Cat", "Utkarsh"
     )
     async def addCustomReact(
-        self, ctx: commands.Context, trigger: str = None, react: discord.Emoji = None
+        self,
+        ctx: commands.Context,
+        trigger: str = None,
+        react: Union[discord.Emoji, str] = None,
     ):
 
         if trigger is None:
@@ -50,7 +55,20 @@ class CustomReacts(commands.Cog):
             await ctx.reply("Need an emote to react!")
             return
 
-        reactString = str(react).replace("<a:", "<:")
+        reactString = ""
+
+        if type(react) == str:
+            emojiList = emoji.emoji_lis(react)
+
+            if len(emojiList) == 0 or emojiList[0]["location"] != 0:
+                await ctx.reply("Need an emote to react!")
+                return
+
+            else:
+                reactString = emojiList[0]["emoji"]
+
+        else:
+            reactString = str(react).replace("<a:", "<:")
 
         self.customReacts[trigger] = reactString
 

@@ -376,6 +376,9 @@ class Experience(commands.Cog):
     @commands.command()
     async def addXPLocal(self, ctx, user: discord.Member, xp: int):
 
+        if environ["BOT_ENV"] != "development":
+            return
+
         await self.updateUserExperience(str(user.id), xp)
         await self.checkUserLevelUp(ctx.message, user)
 

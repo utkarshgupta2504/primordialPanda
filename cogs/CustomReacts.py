@@ -59,6 +59,28 @@ class CustomReacts(commands.Cog):
 
         await ctx.reply("Successfully added custom react!")
 
+    @commands.command(name="removeCustomReact")
+    @commands.has_any_role(
+        "Shrine Priestess", "Red Panda Priest", "Ninja Cat", "Utkarsh"
+    )
+    async def removeCustomReact(self, ctx: commands.Context, trigger: str = None):
+
+        if trigger is None:
+            await ctx.reply("Need a trigger!")
+            return
+
+        if trigger in self.customReacts:
+            self.customReacts.popitem(trigger)
+
+        else:
+            await ctx.reply("No such trigger!")
+            return
+
+        with open("database/customReacts.json", "w") as f:
+            json.dump(self.customReacts, f, indent=2)
+
+        await ctx.reply("Successfully added custom react!")
+
 
 def setup(bot):
     bot.add_cog(CustomReacts(bot))

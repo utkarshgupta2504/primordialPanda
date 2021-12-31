@@ -5,6 +5,7 @@ from discord.ext import commands
 import discord
 import json
 import emoji
+from constants import isTesting
 
 from discord.utils import get
 
@@ -29,6 +30,11 @@ class CustomReacts(commands.Cog):
 
         if not self.isInitialised:
             print("Custom Reacts not initialised")
+            return
+
+        if (isTesting and message.channel.id != 912387794821861396) or (
+            not isTesting and message.channel.id == 912387794821861396
+        ):
             return
 
         for react in self.customReacts:

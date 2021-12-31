@@ -218,7 +218,7 @@ class Experience(commands.Cog):
             )
             return
 
-        if ctx.channel.id != 923646299797078096:
+        if not isTesting and ctx.channel.id != 923646299797078096:
             await ctx.reply(
                 f".. but there is no one here, please see me in {self.bot.get_channel(923646299797078096).mention}"
             )
@@ -316,15 +316,21 @@ class Experience(commands.Cog):
 
             json.dump(self.experience, f, indent=2)
 
-        await self.bot.get_channel(925821155019980830).send(
+        await self.bot.get_channel(
+            926455957737852988 if isTesting else 925821155019980830
+        ).send(
             f"{ctx.author.mention} has chosen to walk along the **Path of the {path.capitalize()}**"
         )
 
-        await self.bot.get_channel(923016846863634442).send(
+        await self.bot.get_channel(
+            926455957737852988 if isTesting else 923016846863634442
+        ).send(
             f"{ctx.author.mention} now walks the **Path of the {path.capitalize()}**"
         )
 
-        await self.bot.get_channel(dormID[path.capitalize()]).send(
+        await self.bot.get_channel(
+            926455957737852988 if isTesting else dormID[path.capitalize()]
+        ).send(
             f"{ctx.author.mention} has joined our superior path, <@&{pathLevelRoles[path.capitalize()][0]}>, come welcome them!"
         )
 

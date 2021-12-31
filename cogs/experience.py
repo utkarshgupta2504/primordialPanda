@@ -356,13 +356,46 @@ class Experience(commands.Cog):
             .add_field(name="Level", value=f"{userXP['level']}", inline=False)
             .add_field(
                 name="Path",
-                value=f"{'None' if 'path' not in userXP else userXP['path']}",
+                value=f"{userXP['path'] if 'path' in userXP else 'Freeloader' if userXP['level'] >= 10 else 'None'}",
             )
             .set_footer(text="Mystical Forest")
             .set_thumbnail(url=user.avatar_url)
         )
 
         await ctx.send(embed=rankEmbed)
+
+    @commands.command(name="leaderboard", aliases=["lb"])
+    async def leaderboard(self, ctx: commands.Context, args: str = None):
+
+        leaderboardXP = sorted(
+            self.experience.items(), key=lambda item: item[1]["xp"], reverse=True
+        )
+
+        mappedLeaderboardXP = enumerate(
+            map(
+                lambda xp: (f"<@!{xp[0]}>", xp[1]),
+                leaderboardXP,
+            ),
+            1,
+        )
+
+        leaderBoardEmbed = (
+            discord.Embed(title="Leaderboard", colour=0xE7841B)
+            .set_footer(text="Mystical Forest")
+            .set_thumbnail(url=ctx.guild.icon_url)
+        )
+
+        for pos, xp in mappedLeaderboardXP:
+            if pos > 10:
+                break
+
+            leaderBoardEmbed.add_field(
+                name="\u200b",
+                value=f"**#{pos} <:pinkdot:913881657994543184> {xp[0]}**\n<:AAblank:926416287054323773> Level {xp[1]['level']}\n<:AAblank:926416287054323773> Path: {xp[1]['path'] if 'path' in xp[1] else 'Freeloader' if xp[1]['level'] >= 10 else 'None'}\n<:AAblank:926416287054323773> Total Exp: {xp[1]['xp']}",
+                inline=False,
+            )
+
+        await ctx.send(embed=leaderBoardEmbed)
 
     @commands.command(name="addXP", aliases=["giveXP"])
     @commands.has_any_role("Shrine Priestess", "Red Panda Priest")

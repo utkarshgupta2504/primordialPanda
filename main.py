@@ -1,4 +1,5 @@
 import discord
+from discord.enums import TeamMembershipState
 from discord.ext import commands
 from dotenv import load_dotenv
 import os
@@ -28,14 +29,18 @@ async def on_member_join(member: discord.Member):
 
 
 @bot.event
-async def on_message(message):
+async def on_message(message: discord.Message):
     if message.author == bot.user:
         return
 
-    if message.content.lower() == "hello":
-        await message.channel.send(f"Hello {message.author.mention}")
-
-    await bot.process_commands(message)
+    if (
+        os.environ["BOT_ENV"] == "development"
+        and message.channel.id == 912387794821861396
+    ) or (
+        os.environ["BOT_ENV"] == "production"
+        and message.channel.id != 912387794821861396
+    ):
+        await bot.process_commands(message)
 
 
 @bot.command()

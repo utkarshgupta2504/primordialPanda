@@ -1,3 +1,6 @@
+from os import environ
+
+
 levelsDict = {
     0: 0,
     1: 35,
@@ -257,3 +260,5 @@ dormID = {
     "Ranger": 923705510602100786,
     "Hermit": 923705029356044308,
 }
+
+isTesting = environ["BOT_ENV"] == "development"

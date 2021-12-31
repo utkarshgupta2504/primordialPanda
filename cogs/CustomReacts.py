@@ -42,11 +42,20 @@ class CustomReacts(commands.Cog):
             if react in message.content.lower():
                 await message.add_reaction(self.customReacts[react])
 
-    @commands.command(name="addCustomReact")
+    @commands.group(
+        name="customReact", case_insensitive=True, invoke_without_command=True
+    )
     @commands.has_any_role(
         "Shrine Priestess", "Red Panda Priest", "Ninja Cat", "Utkarsh"
     )
-    async def addCustomReact(
+    async def customReact(self, ctx):
+        await ctx.send(str(self.customReacts))
+
+    @customReact.command(name="add")
+    @commands.has_any_role(
+        "Shrine Priestess", "Red Panda Priest", "Ninja Cat", "Utkarsh"
+    )
+    async def add(
         self,
         ctx: commands.Context,
         trigger: str = None,
@@ -74,7 +83,7 @@ class CustomReacts(commands.Cog):
                 reactString = emojiList[0]["emoji"]
 
         else:
-            reactString = str(react).replace("<a:", "<:")
+            reactString = str(react)
 
         self.customReacts[trigger] = reactString
 
@@ -83,11 +92,11 @@ class CustomReacts(commands.Cog):
 
         await ctx.reply("Successfully added custom react!")
 
-    @commands.command(name="removeCustomReact")
+    @customReact.command(name="remove", aliases=["rem", "delete", "del"])
     @commands.has_any_role(
         "Shrine Priestess", "Red Panda Priest", "Ninja Cat", "Utkarsh"
     )
-    async def removeCustomReact(self, ctx: commands.Context, trigger: str = None):
+    async def remove(self, ctx: commands.Context, trigger: str = None):
 
         if trigger is None:
             await ctx.reply("Need a trigger!")

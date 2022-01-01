@@ -385,11 +385,28 @@ class Experience(commands.Cog):
             None,
         )
 
+        weeklyRank = next(
+            (
+                pos
+                for pos, xp in enumerate(
+                    sorted(
+                        self.weeklyLeaderboard["leaderboard"].items(),
+                        key=lambda item: item[1],
+                        reverse=True,
+                    ),
+                    1,
+                )
+                if xp[0] == str(user.id)
+            ),
+            None,
+        )
+
         rankEmbed = (
             discord.Embed(
                 title=str(user), description="Your Experience Details", color=0xE7841B
             )
-            .add_field(name="Rank", value=f"{userRank}", inline=False)
+            .add_field(name="Server Rank", value=f"{userRank}", inline=True)
+            .add_field(name="Weekly Rank", value=f"{weeklyRank}", inline=True)
             .add_field(
                 name="XP",
                 value=f"{userXP['xp']}/{str(levelsDict[userXP['level']+1]) if (userXP['level']+1) in levelsDict else 'MAX'}",
@@ -456,7 +473,7 @@ class Experience(commands.Cog):
         )
 
         weeklyLeaderBoardEmbed = (
-            discord.Embed(title="Leaderboard", colour=0xE7841B)
+            discord.Embed(title="Weekly Leaderboard", colour=0xE7841B)
             .set_footer(text="Mystical Forest")
             .set_thumbnail(url=ctx.guild.icon_url)
         )

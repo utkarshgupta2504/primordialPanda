@@ -12,6 +12,8 @@ intents.members = True
 
 load_dotenv()
 
+from constants import *
+
 bot = commands.Bot(command_prefix="?", intents=intents, case_insensitive=True)
 
 for i in next(os.walk(os.getcwd() + "/cogs"), (None, None, []))[2][::-1]:
@@ -30,7 +32,29 @@ async def on_member_join(member: discord.Member):
 
 @bot.event
 async def on_member_update(before: discord.Member, after: discord.Member):
-    pass
+
+    beforeRoles = map(lambda role: role.id, before.roles)
+    afterRoles = map(lambda role: role.id, after.roles)
+
+    if isTesting:
+        if 926714233691975691 in beforeRoles and 926714233691975691 not in afterRoles:
+            await bot.get_channel(926455957737852988).send(
+                f"{before.mention} has stopped boosting the server!"
+            )
+        elif 926714233691975691 not in beforeRoles and 926714233691975691 in afterRoles:
+            await bot.get_channel(926455957737852988).send(
+                f"{before.mention} **Thank you for boosting!** <:MFredpandaheart:925570592646787172> The Primordial Panda is pleased and grants you your own custom channel, custom reaction, and you can pick a role color!"
+            )
+
+    else:
+        if 924960403346296902 in beforeRoles and 924960403346296902 not in afterRoles:
+            await bot.get_channel(911374839506423830).send(
+                f"{before.mention} has stopped boosting the server!"
+            )
+        elif 924960403346296902 not in beforeRoles and 924960403346296902 in afterRoles:
+            await bot.get_channel(922990287251456081).send(
+                f"{before.mention} **Thank you for boosting!** <:MFredpandaheart:925570592646787172> The Primordial Panda is pleased and grants you your own custom channel, custom reaction, and you can pick a role color!"
+            )
 
 
 @bot.event

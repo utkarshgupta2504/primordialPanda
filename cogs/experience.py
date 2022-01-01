@@ -3,11 +3,12 @@
 import asyncio
 from os import environ
 from discord import colour
-from discord.ext import commands
+from discord.ext import commands, tasks
 from discord.utils import get
 import discord
 import typing
 import json
+import time
 
 from constants import *
 
@@ -22,6 +23,9 @@ class Experience(commands.Cog):
         )
         self.isInitialised = False
         self.experience = {}
+        self.weeklyLeaderboard = {}
+
+        self.resetWeeklyLeaderboard.start()
 
     def get_ratelimit(self, message: discord.Message) -> typing.Optional[int]:
         """Returns the ratelimit left"""
@@ -32,11 +36,19 @@ class Experience(commands.Cog):
         if id not in self.experience:
             self.experience[id] = {"xp": 0, "level": 0}
 
+        if id not in self.weeklyLeaderboard["leaderboard"]:
+            self.weeklyLeaderboard["leaderboard"][id] = 0
+
         self.experience[id]["xp"] += xp
+        self.weeklyLeaderboard["leaderboard"][id] += xp
 
         with open("database/experience.json", "w") as f:
 
             json.dump(self.experience, f, indent=2)
+
+            with open("database/weeklyLeaderboard.json", "w") as f1:
+
+                json.dump(self.weeklyLeaderboard, f1, indent=2)
 
     async def checkUserLevelUp(
         self, message: discord.Message, user: discord.Member = None
@@ -187,7 +199,10 @@ class Experience(commands.Cog):
         with open("database/experience.json", "r") as f:
             self.experience = json.load(f)
 
-            self.isInitialised = True
+            with open("database/weeklyLeaderboard.json", "r") as f1:
+                self.weeklyLeaderboard = json.load(f1)
+
+                self.isInitialised = True
 
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
@@ -391,8 +406,8 @@ class Experience(commands.Cog):
 
         await ctx.send(embed=rankEmbed)
 
-    @commands.command(name="leaderboard", aliases=["lb"])
-    async def leaderboard(self, ctx: commands.Context, args: str = None):
+    @commands.group(name="leaderboard", aliases=["lb"], invoke_without_command=True)
+    async def leaderboard(self, ctx: commands.Context):
 
         leaderboardXP = sorted(
             self.experience.items(), key=lambda item: item[1]["xp"], reverse=True
@@ -423,6 +438,57 @@ class Experience(commands.Cog):
             )
 
         await ctx.send(embed=leaderBoardEmbed)
+
+    @leaderboard.command(name="weekly", aliases=["w"])
+    async def weekly(self, ctx):
+        weeklyLeaderboardXP = sorted(
+            self.weeklyLeaderboard["leaderboard"].items(),
+            key=lambda item: item[1],
+            reverse=True,
+        )
+
+        mappedWeeklyLeaderboardXP = enumerate(
+            map(
+                lambda xp: (f"<@!{xp[0]}>", xp[1]),
+                weeklyLeaderboardXP,
+            ),
+            1,
+        )
+
+        weeklyLeaderBoardEmbed = (
+            discord.Embed(title="Leaderboard", colour=0xE7841B)
+            .set_footer(text="Mystical Forest")
+            .set_thumbnail(url=ctx.guild.icon_url)
+        )
+
+        for pos, xp in mappedWeeklyLeaderboardXP:
+            if pos > 10:
+                break
+
+            weeklyLeaderBoardEmbed.add_field(
+                name="\u200b",
+                value=f"**#{pos} <:pinkdot:913881657994543184> {xp[0]}**\n<:AAblank:926416287054323773> Exp: {xp[1]}",
+                inline=False,
+            )
+
+        await ctx.send(embed=weeklyLeaderBoardEmbed)
+
+    @tasks.loop(minutes=10)
+    async def resetWeeklyLeaderboard(self):
+        if int(time.time()) - self.weeklyLeaderboard["lastTime"] >= 604800:
+
+            print("Resetting weekly leaderboard")
+
+            self.weeklyLeaderboard["lastTime"] = int(time.time())
+            self.weeklyLeaderboard["leaderboard"] = {}
+
+            with open("database/weeklyLeaderboard.json", "w") as f1:
+
+                json.dump(self.weeklyLeaderboard, f1, indent=2)
+
+    @resetWeeklyLeaderboard.before_loop
+    async def beforeReset(self):
+        await self.bot.wait_until_ready()
 
     @commands.command(name="addXP", aliases=["giveXP"])
     @commands.has_any_role("Shrine Priestess", "Red Panda Priest")

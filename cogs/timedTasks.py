@@ -4,6 +4,8 @@ from discord.ext import commands, tasks
 import discord
 import datetime
 
+from constants import *
+
 
 class TimedTasks(commands.Cog):
     """The description for TimedTasks goes here."""
@@ -12,12 +14,14 @@ class TimedTasks(commands.Cog):
         self.bot = bot
         self.timer.start()
 
-    @tasks.loop(minutes=4)
+    @tasks.loop(minutes=5)
     async def timer(self):
         utcPlus12 = datetime.datetime.utcnow() + datetime.timedelta(hours=12)
-        await self.bot.get_channel(926802636685082654).edit(
-            name=utcPlus12.strftime("%#I:%M %p on %a %b %#d")
-        )
+
+        if not isTesting:
+            await self.bot.get_channel(926802636685082654).edit(
+                name=utcPlus12.strftime("%#I:%M %p on %a %b %#d")
+            )
 
     @timer.before_loop
     async def before_timer(self):

@@ -348,12 +348,33 @@ class Experience(commands.Cog):
         if user is None:
             user = ctx.author
 
+        if str(user.id) not in self.experience:
+            await ctx.send("This user has not yet begun their journey!")
+            return
+
         userXP = self.experience[str(user.id)]
+
+        userRank = next(
+            (
+                pos
+                for pos, xp in enumerate(
+                    sorted(
+                        self.experience.items(),
+                        key=lambda item: item[1]["xp"],
+                        reverse=True,
+                    ),
+                    1,
+                )
+                if xp[0] == str(user.id)
+            ),
+            None,
+        )
 
         rankEmbed = (
             discord.Embed(
                 title=str(user), description="Your Experience Details", color=0xE7841B
             )
+            .add_field(name="Rank", value=f"{userRank}", inline=False)
             .add_field(
                 name="XP",
                 value=f"{userXP['xp']}/{str(levelsDict[userXP['level']+1]) if (userXP['level']+1) in levelsDict else 'MAX'}",

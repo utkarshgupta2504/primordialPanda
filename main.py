@@ -29,6 +29,11 @@ async def on_member_join(member: discord.Member):
 
 
 @bot.event
+async def on_member_update(before: discord.Member, after: discord.Member):
+    pass
+
+
+@bot.event
 async def on_message(message: discord.Message):
     if message.author == bot.user:
         return

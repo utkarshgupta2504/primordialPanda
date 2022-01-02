@@ -33,8 +33,25 @@ async def on_member_join(member: discord.Member):
 @bot.event
 async def on_member_update(before: discord.Member, after: discord.Member):
 
-    beforeRoles = map(lambda role: role.id, before.roles)
-    afterRoles = map(lambda role: role.id, after.roles)
+    beforeRoles = list(map(lambda role: role.id, before.roles))
+    afterRoles = list(map(lambda role: role.id, after.roles))
+
+    print(
+        f"Local Boosted: Yes: {926714233691975691 not in beforeRoles and 926714233691975691 in afterRoles}, No: {926714233691975691 in beforeRoles and 926714233691975691 not in afterRoles}"
+    )
+    print(
+        f"Main Boosted: Yes: {924960403346296902 not in beforeRoles and 924960403346296902 in afterRoles}, No: {924960403346296902 in beforeRoles and 924960403346296902 not in afterRoles}"
+    )
+
+    await bot.get_channel(926455957737852988).send(
+        "Before: \n>>> "
+        + "\n".join(map(str, beforeRoles))
+        + "\n\nAfter: \n>>> "
+        + "\n".join(map(str, afterRoles))
+    )
+
+    print(beforeRoles)
+    print(afterRoles)
 
     if 926714233691975691 in beforeRoles and 926714233691975691 not in afterRoles:
         await bot.get_channel(926455957737852988).send(
@@ -44,6 +61,8 @@ async def on_member_update(before: discord.Member, after: discord.Member):
         await bot.get_channel(926455957737852988).send(
             f"{before} **Thank you for boosting!** <:MFredpandaheart:925570592646787172> The Primordial Panda is pleased and grants you your own custom channel, custom reaction, and you can pick a role color!"
         )
+
+    print("Testing: " + str(isTesting))
 
     if not isTesting:
         if 924960403346296902 in beforeRoles and 924960403346296902 not in afterRoles:

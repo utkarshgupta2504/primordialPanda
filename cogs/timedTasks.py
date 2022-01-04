@@ -24,9 +24,14 @@ class TimedTasks(commands.Cog):
         utcPlus12 = datetime.datetime.utcnow() + datetime.timedelta(hours=12)
 
         if not isTesting:
-            await self.bot.get_channel(926802636685082654).edit(
-                name=utcPlus12.strftime("%#I:%M %p on %a %b %#d")
-            )
+            try:
+                await self.bot.get_channel(926802636685082654).edit(
+                    name=utcPlus12.strftime("%#I:%M %p on %a %b %#d")
+                )
+
+            except Exception as e:
+
+                print(e)
 
             for i in pathLevelRoles:
 

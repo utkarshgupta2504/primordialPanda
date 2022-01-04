@@ -41,7 +41,9 @@ class CustomPerks(commands.Cog):
 
         currTime = int(time.time())
 
-        for i in self.channelsToBeDeleted:
+        keys = list(self.channelsToBeDeleted.keys())[:]
+
+        for i in keys:
             if int(i) <= currTime:
 
                 retiredCategory = get(
@@ -65,10 +67,15 @@ class CustomPerks(commands.Cog):
                     send_messages=False,
                 )
 
+                self.customChannels.pop(str(self.channelsToBeDeleted[i]["user"]))
+
                 self.channelsToBeDeleted.pop(i)
 
-                with open("database/channelsToBeDeleted.json", "w") as f:
-                    json.dump(self.channelsToBeDeleted, f, indent=2)
+        with open("database/customChannels.json", "w") as f:
+            json.dump(self.customChannels, f, indent=2)
+
+        with open("database/channelsToBeDeleted.json", "w") as f:
+            json.dump(self.channelsToBeDeleted, f, indent=2)
 
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):

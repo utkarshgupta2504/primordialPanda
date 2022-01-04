@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from discord.ext import commands, tasks
+from discord.utils import get
 import discord
 import datetime
 import json
@@ -26,6 +27,12 @@ class TimedTasks(commands.Cog):
             await self.bot.get_channel(926802636685082654).edit(
                 name=utcPlus12.strftime("%#I:%M %p on %a %b %#d")
             )
+
+            for i in pathLevelRoles:
+
+                await self.bot.get_channel(927615922921938944).edit(
+                    name=f"{i}s: {len(get(self.bot.get_guild(911016512574341140).roles, id=pathLevelRoles[i][0]).members)}"
+                )
 
     @timer.before_loop
     async def before_timer(self):

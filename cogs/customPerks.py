@@ -382,6 +382,104 @@ class CustomPerks(commands.Cog):
 
         await sentMessage.edit(content="Booster Channel created successfully!")
 
+    @customChannel.group(name="revive", aliases=["rev"], invoke_without_command=True)
+    @commands.has_any_role(
+        "Shrine Priestess",
+        "Red Panda Priest",
+        "Ninja Cat",
+        "Utkarsh",
+        "Venster",
+        "Local Hermit",
+    )
+    async def reviveCustomChannel(
+        self,
+        ctx: commands.Context,
+        channel: discord.TextChannel = None,
+        user: discord.Member = None,
+    ):
+
+        if channel is None:
+            await ctx.reply("Please mention a channel!")
+            return
+
+        if user is None:
+            await ctx.reply("Please mention a user for perms!")
+            return
+
+        if channel.category_id != 925016314236514355:
+            await ctx.reply("The channel is not archived!")
+            return
+
+        sentMessage = await ctx.send("Reviving channel...")
+
+        perms: discord.PermissionOverwrite = channel.overwrites_for(user)
+        perms.manage_messages = True
+        perms.manage_channels = True
+
+        await channel.set_permissions(user, overwrite=perms)
+
+        theMoorsCategory: discord.CategoryChannel = get(
+            ctx.guild.categories, id=927302268431265843
+        )
+
+        await channel.edit(category=theMoorsCategory)
+
+        await sentMessage.edit(content="Channel revived successfully!")
+
+    @reviveCustomChannel.command(name="boost", aliases=["booster"])
+    @commands.has_any_role(
+        "Shrine Priestess",
+        "Red Panda Priest",
+        "Ninja Cat",
+        "Utkarsh",
+        "Venster",
+        "Local Hermit",
+    )
+    async def reviveChannelAsBooster(
+        self, ctx: commands.Context, channel: discord.TextChannel, user: discord.Member
+    ):
+
+        if channel is None:
+            await ctx.reply("Please mention a channel!")
+            return
+
+        if user is None:
+            await ctx.reply("Please mention a user for perms!")
+            return
+
+        if channel.category_id != 925016314236514355:
+            await ctx.reply("The channel is not archived!")
+            return
+
+        boostRole = get(
+            ctx.guild.roles, id=926714233691975691 if isTesting else 924960403346296902
+        )
+
+        if boostRole not in user.roles:
+            await ctx.reply("This user is not a booster!")
+            return
+
+        sentMessage = await ctx.send("Reviving channel...")
+
+        perms: discord.PermissionOverwrite = channel.overwrites_for(user)
+        perms.manage_messages = True
+        perms.manage_channels = True
+
+        await channel.set_permissions(user, overwrite=perms)
+
+        theMoorsCategory: discord.CategoryChannel = get(
+            ctx.guild.categories, id=927302268431265843
+        )
+
+        await channel.edit(category=theMoorsCategory)
+
+        self.customChannels[str(user.id)] = channel.id
+
+        with open("database/customChannels.json", "w") as f:
+            json.dump(self.customChannels, f, indent=2)
+
+        await sentMessage.edit(content="Channel revived as booster successfully!")
+
 
 def setup(bot):
     bot.add_cog(CustomPerks(bot))

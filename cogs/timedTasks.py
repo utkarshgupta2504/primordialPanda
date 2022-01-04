@@ -3,6 +3,9 @@
 from discord.ext import commands, tasks
 import discord
 import datetime
+import json
+import os
+import io
 
 from constants import *
 
@@ -13,6 +16,7 @@ class TimedTasks(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
         self.timer.start()
+        self.backupTimer.start()
 
     @tasks.loop(minutes=5)
     async def timer(self):
@@ -26,6 +30,25 @@ class TimedTasks(commands.Cog):
     @timer.before_loop
     async def before_timer(self):
         await self.bot.wait_until_ready()
+
+    @tasks.loop(hours=12)
+    async def backupTimer(self):
+
+        if not isTesting:
+            await self.bot.get_channel(927305899171803176).purge()
+
+            for i in next(os.walk(os.getcwd() + "/database"), (None, None, []))[2]:
+
+                with open(f"database/{i}", "r") as f:
+
+                    tempStringIO = io.StringIO()
+                    json.dump(json.load(f), tempStringIO, indent=2)
+
+                    tempStringIO.seek(0)
+
+                    fileToSend = discord.File(tempStringIO, filename=i)
+
+                    await self.bot.get_channel(927305899171803176).send(file=fileToSend)
 
 
 def setup(bot):

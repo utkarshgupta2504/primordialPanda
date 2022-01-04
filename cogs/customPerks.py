@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 
 from typing import Union
-from discord.ext import commands
+from discord.ext import commands, tasks
 import discord
 import json
 import emoji
 from constants import isTesting
+import time
 
 from discord.utils import get
 
@@ -16,14 +17,58 @@ class CustomPerks(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
         self.customReacts = {}
+        self.customChannels = {}
+        self.channelsToBeDeleted = {}
         self.isInitialised = False
+
+        self.checkChannelsToDelete.start()
 
     @commands.Cog.listener()
     async def on_ready(self):
         with open("database/customReacts.json", "r") as f:
             self.customReacts = json.load(f)
 
-            self.isInitialised = True
+            with open("database/customChannels.json", "r") as f1:
+                self.customChannels = json.load(f1)
+
+                with open("database/channelsToBeDeleted.json", "r") as f2:
+                    self.channelsToBeDeleted = json.load(f2)
+
+                    self.isInitialised = True
+
+    @tasks.loop(seconds=10)
+    async def checkChannelsToDelete(self):
+
+        currTime = int(time.time())
+
+        for i in self.channelsToBeDeleted:
+            if int(i) <= currTime:
+
+                retiredCategory = get(
+                    self.bot.get_guild(911016512574341140).categories,
+                    id=925016314236514355,
+                )
+
+                boostedChannel: discord.TextChannel = self.bot.get_channel(
+                    self.channelsToBeDeleted[i]["channel"]
+                )
+
+                await boostedChannel.edit(category=retiredCategory)
+
+                await boostedChannel.set_permissions(
+                    self.bot.get_user(self.channelsToBeDeleted[i]["user"]),
+                    overwrite=None,
+                )
+
+                await boostedChannel.set_permissions(
+                    self.bot.get_guild(911016512574341140).default_role,
+                    send_messages=False,
+                )
+
+                self.channelsToBeDeleted.pop(i)
+
+                with open("database/channelsToBeDeleted.json", "w") as f:
+                    json.dump(self.channelsToBeDeleted, f, indent=2)
 
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
@@ -41,6 +86,101 @@ class CustomPerks(commands.Cog):
 
             if react in message.content.lower():
                 await message.add_reaction(self.customReacts[react])
+
+    @commands.Cog.listener()
+    async def on_member_update(self, before: discord.Member, after: discord.Member):
+
+        beforeRoles = list(map(lambda role: role.id, before.roles))
+        afterRoles = list(map(lambda role: role.id, after.roles))
+
+        # await self.bot.get_channel(926455957737852988).send(
+        #     "Before: \n>>> "
+        #     + "\n".join(map(str, beforeRoles))
+        #     + "\n\nAfter: \n>>> "
+        #     + "\n".join(map(str, afterRoles))
+        # )
+
+        # print(beforeRoles)
+        # print(afterRoles)
+        if isTesting:
+            if (
+                926714233691975691 in beforeRoles
+                and 926714233691975691 not in afterRoles
+            ):
+                await self.bot.get_channel(926455957737852988).send(
+                    f"{before.mention} has stopped boosting the server <a:swalk:926814125215076424>"
+                )
+
+                if str(before.id) in self.customChannels:
+                    await before.send(
+                        embed=discord.Embed(
+                            colour=0xE7841B,
+                            description=f"In about 3 days we will send the archivist to collect your tomes of the channel {self.bot.get_channel(self.customChannels[str(before.id)]).mention}, thank you for having boosted our server, the archivist will take great care of them until you choose to take them out again.",
+                        )
+                        .set_thumbnail(
+                            url="https://cdn.discordapp.com/emojis/925101102242865297.png?size=1024"
+                        )
+                        .set_footer(text="Mystical Forest"),
+                    )
+
+                    self.channelsToBeDeleted[str(int(time.time() + 10))] = {
+                        "channel": self.customChannels[str(before.id)],
+                        "user": before.id,
+                    }
+
+                    with open("database/channelsToBeDeleted.json", "w") as f:
+                        json.dump(self.channelsToBeDeleted, f, indent=2)
+
+            elif (
+                926714233691975691 not in beforeRoles
+                and 926714233691975691 in afterRoles
+            ):
+                await self.bot.get_channel(926455957737852988).send(
+                    f"{before.mention} **Thank you for boosting!** <:MFredpandaheart:925570592646787172> The Primordial Panda is pleased and grants you your own custom channel, custom reaction, and you can pick a role color!"
+                )
+
+        # print("Testing: " + str(isTesting))
+
+        else:
+            if (
+                924960403346296902 in beforeRoles
+                and 924960403346296902 not in afterRoles
+            ):
+                await self.bot.get_channel(922990287251456081).send(
+                    f"{before.mention} has stopped boosting the server <a:swalk:926814125215076424>"
+                )
+
+                if str(before.id) in self.customChannels:
+                    await before.send(
+                        embed=discord.Embed(
+                            colour=0xE7841B,
+                            description=f"In about 3 days we will send the archivist to collect your tomes of the channel {self.bot.get_channel(self.customChannels[str(before.id)]).mention}, thank you for having boosted our server, the archivist will take great care of them until you choose to take them out again.",
+                        )
+                        .set_thumbnail(
+                            url="https://cdn.discordapp.com/emojis/925101102242865297.png?size=1024"
+                        )
+                        .set_footer(text="Mystical Forest"),
+                    )
+
+                    self.channelsToBeDeleted[str(int(time.time() + 259200))] = {
+                        "channel": self.customChannels[str(before.id)],
+                        "user": before.id,
+                    }
+
+                    with open("database/channelsToBeDeleted.json", "w") as f:
+                        json.dump(self.channelsToBeDeleted, f, indent=2)
+
+            elif (
+                924960403346296902 not in beforeRoles
+                and 924960403346296902 in afterRoles
+            ):
+                await self.bot.get_channel(923016846863634442).send(
+                    f"{before.mention} **Thank you for boosting!** <:MFredpandaheart:925570592646787172> The Primordial Panda is pleased and grants you your own custom channel, custom reaction, and you can pick a role color!"
+                )
+
+                await self.bot.get_channel(922990287251456081).send(
+                    f"{before.mention} has started boosting the server <a:BlankiesDance:926111686874791996>"
+                )
 
     @commands.group(
         name="customReact", case_insensitive=True, invoke_without_command=True
@@ -142,7 +282,9 @@ class CustomPerks(commands.Cog):
 
         pass
 
-    @customChannel.command(name="create", aliases=["add", "cr", "make"])
+    @customChannel.group(
+        name="create", aliases=["add", "cr", "make"], invoke_without_command=True
+    )
     @commands.has_any_role(
         "Shrine Priestess",
         "Red Panda Priest",
@@ -165,12 +307,12 @@ class CustomPerks(commands.Cog):
 
         sentMessage: discord.Message = await ctx.send("Creating custom channel")
 
-        spamCategory: discord.CategoryChannel = get(
-            ctx.guild.categories, id=911024015693479967
+        theMoorsCategory: discord.CategoryChannel = get(
+            ctx.guild.categories, id=927302268431265843
         )
 
-        createdChannel: discord.TextChannel = await spamCategory.create_text_channel(
-            name
+        createdChannel: discord.TextChannel = (
+            await theMoorsCategory.create_text_channel(name)
         )
 
         perms: discord.PermissionOverwrite = createdChannel.overwrites_for(user)
@@ -180,6 +322,58 @@ class CustomPerks(commands.Cog):
         await createdChannel.set_permissions(user, overwrite=perms)
 
         await sentMessage.edit(content="Channel created successfully!")
+
+    @createCustomChannel.command(name="boost", aliases=["booster"])
+    @commands.has_any_role(
+        "Shrine Priestess",
+        "Red Panda Priest",
+        "Ninja Cat",
+        "Utkarsh",
+        "Venster",
+        "Local Hermit",
+    )
+    async def createBoostChannel(
+        self, ctx: commands.Context, name: str, user: discord.Member
+    ):
+
+        if name is None:
+            await ctx.reply("Need a channel name!")
+            return
+
+        if user is None:
+            await ctx.reply("Need a user to provide admin perms to!")
+            return
+
+        boostRole = get(
+            ctx.guild.roles, id=926714233691975691 if isTesting else 924960403346296902
+        )
+
+        if boostRole not in user.roles:
+            await ctx.reply("This user is not a booster!")
+            return
+
+        sentMessage: discord.Message = await ctx.send("Creating custom channel...")
+
+        theMoorsCategory: discord.CategoryChannel = get(
+            ctx.guild.categories, id=927302268431265843
+        )
+
+        createdChannel: discord.TextChannel = (
+            await theMoorsCategory.create_text_channel(name)
+        )
+
+        perms: discord.PermissionOverwrite = createdChannel.overwrites_for(user)
+        perms.manage_messages = True
+        perms.manage_channels = True
+
+        await createdChannel.set_permissions(user, overwrite=perms)
+
+        self.customChannels[str(user.id)] = createdChannel.id
+
+        with open("database/customChannels.json", "w") as f:
+            json.dump(self.customChannels, f, indent=2)
+
+        await sentMessage.edit(content="Booster Channel created successfully!")
 
 
 def setup(bot):

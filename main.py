@@ -31,48 +31,6 @@ async def on_member_join(member: discord.Member):
 
 
 @bot.event
-async def on_member_update(before: discord.Member, after: discord.Member):
-
-    beforeRoles = list(map(lambda role: role.id, before.roles))
-    afterRoles = list(map(lambda role: role.id, after.roles))
-
-    # await bot.get_channel(926455957737852988).send(
-    #     "Before: \n>>> "
-    #     + "\n".join(map(str, beforeRoles))
-    #     + "\n\nAfter: \n>>> "
-    #     + "\n".join(map(str, afterRoles))
-    # )
-
-    # print(beforeRoles)
-    # print(afterRoles)
-
-    if 926714233691975691 in beforeRoles and 926714233691975691 not in afterRoles:
-        await bot.get_channel(926455957737852988).send(
-            f"{before.mention} has stopped boosting the server <a:swalk:926814125215076424>"
-        )
-    elif 926714233691975691 not in beforeRoles and 926714233691975691 in afterRoles:
-        await bot.get_channel(926455957737852988).send(
-            f"{before.mention} **Thank you for boosting!** <:MFredpandaheart:925570592646787172> The Primordial Panda is pleased and grants you your own custom channel, custom reaction, and you can pick a role color!"
-        )
-
-    # print("Testing: " + str(isTesting))
-
-    if not isTesting:
-        if 924960403346296902 in beforeRoles and 924960403346296902 not in afterRoles:
-            await bot.get_channel(922990287251456081).send(
-                f"{before.mention} has stopped boosting the server <a:swalk:926814125215076424>"
-            )
-        elif 924960403346296902 not in beforeRoles and 924960403346296902 in afterRoles:
-            await bot.get_channel(923016846863634442).send(
-                f"{before.mention} **Thank you for boosting!** <:MFredpandaheart:925570592646787172> The Primordial Panda is pleased and grants you your own custom channel, custom reaction, and you can pick a role color!"
-            )
-
-            await bot.get_channel(922990287251456081).send(
-                f"{before.mention} has started boosting the server <a:BlankiesDance:926111686874791996>"
-            )
-
-
-@bot.event
 async def on_message(message: discord.Message):
     if message.author == bot.user:
         return
@@ -117,8 +75,21 @@ async def verify(ctx: commands.Context):
     )
 
     await bot.get_channel(923016846863634442).send(
-        f"A new servant, {ctx.author.mention}, has pledged their loyalty to the mystical forest. Join me in welcoming them. <@&923602007649026078>"
+        f"A new servant, {ctx.author.mention}, has pledged their loyalty to the Mystical Forest. Join me in welcoming them. <@&923602007649026078>"
     )
+
+
+# @bot.command(name="rename")
+# async def renameEmoji(ctx: commands.Context):
+
+#     sentMessage = await ctx.send("Renaming emojis, please wait...")
+
+#     for emote in ctx.guild.emojis:
+
+#         if emote.name[-3:] != "OwO":
+#             await emote.edit(name=emote.name + "OwO")
+
+#     await sentMessage.edit(content="Rename Successful")
 
 
 bot.run(os.environ["BOT_TOKEN"])

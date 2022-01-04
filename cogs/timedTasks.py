@@ -50,6 +50,10 @@ class TimedTasks(commands.Cog):
 
                     await self.bot.get_channel(927305899171803176).send(file=fileToSend)
 
+    @backupTimer.before_loop
+    async def beforeBackupTimer(self):
+        await self.bot.wait_until_ready()
+
 
 def setup(bot):
     bot.add_cog(TimedTasks(bot))

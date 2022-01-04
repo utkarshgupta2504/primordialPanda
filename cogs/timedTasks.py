@@ -35,7 +35,15 @@ class TimedTasks(commands.Cog):
 
             for i in pathLevelRoles:
 
-                await self.bot.get_channel(927615922921938944).edit(
+                await self.bot.get_channel(
+                    {
+                        "Overseer": 927615922921938944,
+                        "Architect": 927615714620244058,
+                        "Caregiver": 927615800985133178,
+                        "Ranger": 927615763639062539,
+                        "Hermit": 927615878592352286,
+                    }[i]
+                ).edit(
                     name=f"{i}s: {len(get(self.bot.get_guild(911016512574341140).roles, id=pathLevelRoles[i][0]).members)}"
                 )
 

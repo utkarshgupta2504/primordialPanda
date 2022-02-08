@@ -12,21 +12,21 @@ class Triggers(commands.Cog):
 
     @commands.command()
     async def flowers(self, ctx):
-        await ctx.send("<a:flowers:922167600438444112>" * 21)
+        await ctx.send("<a:flowers:922167600438444112>" * 16)
         await ctx.message.delete()
 
     @commands.command()
     async def catline(self, ctx):
         await ctx.send(
             "<:catLine1:922141508029804564>"
-            + "<:catLine2:922141539289935872>" * 19
+            + "<:catLine2:922141539289935872>" * 4
             + "<:catLine3:922141563075833887>"
         )
         await ctx.message.delete()
 
     @commands.command()
     async def line(self, ctx):
-        await ctx.send("<a:rainbowLine:922163822549168148>" * 21)
+        await ctx.send("<a:rainbowLine:922163822549168148>" * 16)
         await ctx.message.delete()
 
 

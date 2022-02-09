@@ -1,18 +1,21 @@
-import discord
-from discord.enums import TeamMembershipState
 from discord.ext import commands
-from dotenv import load_dotenv
-import os
+from discord.enums import TeamMembershipState
+import io
+import traceback
+import aiohttp
 import sys
+import os
+import discord
+from dotenv import load_dotenv
+load_dotenv()
+
+from constants import *
 
 sys.path.append(os.getcwd())
 
 intents = discord.Intents.default()
 intents.members = True
 
-load_dotenv()
-
-from constants import *
 
 bot = commands.Bot(command_prefix="?", intents=intents, case_insensitive=True)
 
@@ -90,6 +93,78 @@ async def verify(ctx: commands.Context):
 #             await emote.edit(name=emote.name + "OwO")
 
 #     await sentMessage.edit(content="Rename Successful")
+
+# These exceptions are ignored.
+filter_excs = (commands.CommandNotFound, commands.CheckFailure)
+# These are exception types you want to handle explicitly.
+handle_excs = (commands.UserInputError,)
+
+
+async def try_hastebin(content):
+    """Upload to Hastebin, if possible."""
+    payload = content.encode('utf-8')
+    async with aiohttp.ClientSession(raise_for_status=True) as cs:
+        async with cs.post('https://hastebin.com/documents', data=payload) as res:
+            post = await res.json()
+    uri = post['key']
+    return f'https://hastebin/{uri}'
+
+
+async def send_to_owner(content):
+    """Send content to owner. If content is small enough, send directly.
+    Otherwise, try Hastebin first, then upload as a File."""
+    owner = bot.get_user(bot.owner_id)
+    log_channel = bot.get_channel(941054428314738738)
+    if owner is None:
+        return
+    if len(content) < 1990:
+        await owner.send(f'```\ncontent\n```')
+        await log_channel.send(f'```\ncontent\n```')
+    else:
+        try:
+            hastebinResponse = await try_hastebin(content)
+            await owner.send(hastebinResponse)
+            await log_channel.send(hastebinResponse)
+        except aiohttp.ClientResponseError:
+            await owner.send(file=discord.File(io.StringIO(content), filename='traceback.txt'))
+            await log_channel.send(file=discord.File(io.StringIO(content), filename='traceback.txt'))
+
+
+@bot.event
+async def on_error(event, *args, **kwargs):
+    """Error handler for all events."""
+    print("Error", event)
+    s = traceback.format_exc()
+    content = f'Ignoring exception in {event}\n{s}'
+    print(content, file=sys.stderr)
+    await send_to_owner(content)
+
+
+async def handle_command_error(ctx: commands.Context, exc: Exception):
+    """Handle specific exceptions separately here"""
+    pass
+
+
+@bot.event
+async def on_command_error(ctx: commands.Context, exc: Exception):
+    """Error handler for commands"""
+    if isinstance(exc, filter_excs):
+        # These exceptions are ignored completely.
+        return
+
+    # if isinstance(exc, handle_excs):
+    #     # Explicitly handle these exceptions.
+    #     return await handle_command_error(ctx, exc)
+
+    # print("Error", exc.__traceback__)
+
+    # Log the error and bug the owner.
+    exc = getattr(exc, 'original', exc)
+    lines = ''.join(traceback.format_exception(
+        exc.__class__, exc, exc.__traceback__))
+    lines = f'Ignoring exception in command {ctx.command}:\n{lines}'
+    print(lines)
+    await send_to_owner(lines)
 
 
 bot.run(os.environ["BOT_TOKEN"])

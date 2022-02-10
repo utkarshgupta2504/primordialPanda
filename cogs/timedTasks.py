@@ -32,15 +32,15 @@ class TimedTasks(commands.Cog):
 
             self.isInitialised = True
 
-    @commands.group(name="reminder", case_insensitive=True)
+    @commands.group(name="reminder", aliases=["remind", "rmd"], case_insensitive=True)
     async def reminder(self, ctx):
         pass
 
     @reminder.command(name="add")
-    async def reminderAdd(self, ctx: commands.Context, duration: str, *reminderString):
+    async def reminderAdd(self, ctx: commands.Context, duration: str, *reminder_text):
 
         user = ctx.author.id
-        rem = " ".join(reminderString)
+        rem = " ".join(reminder_text)
 
         parsedTime = pytimeparse.parse(duration)
 
@@ -63,10 +63,10 @@ class TimedTasks(commands.Cog):
         await ctx.reply("Reminder added!")
 
     @reminder.command(name="repeat", aliases=["rep", "recurring", "recur"])
-    async def repeatingReminder(self, ctx, initialDuration, repeatingDuration, *reminderString):
+    async def repeatingReminder(self, ctx, initialDuration, repeatingDuration, *reminder_text):
 
         user = ctx.author.id
-        rem = " ".join(reminderString)
+        rem = " ".join(reminder_text)
 
         parsedTime = pytimeparse.parse(initialDuration)
 

@@ -80,7 +80,8 @@ class Experience(commands.Cog):
             isLeveledUp = True
 
             if currLevel == 10:
-                rolesToAdd.append(get(message.guild.roles, id=923622800508465303))
+                rolesToAdd.append(
+                    get(message.guild.roles, id=923622800508465303))
 
                 embedsToSend.append(
                     discord.Embed(
@@ -98,7 +99,8 @@ class Experience(commands.Cog):
                     rolesToAdd.append(
                         get(
                             message.guild.roles,
-                            id=pathLevelRoles[self.experience[id]["path"]][currLevel],
+                            id=pathLevelRoles[self.experience[id]
+                                              ["path"]][currLevel],
                         )
                     )
 
@@ -166,7 +168,8 @@ class Experience(commands.Cog):
             levelUpEmbed = (
                 discord.Embed(
                     title="Level Up!",
-                    description=embedDescription.replace("<level>", str(currLevel)),
+                    description=embedDescription.replace(
+                        "<level>", str(currLevel)),
                     colour=0xE7841B,
                 )
                 .set_footer(text="Mystical Forest")
@@ -450,7 +453,7 @@ class Experience(commands.Cog):
 
             leaderBoardEmbed.add_field(
                 name="\u200b",
-                value=f"**#{pos} <:pinkdot:913881657994543184> {xp[0]}**\n<:AAblank:926416287054323773> Level {xp[1]['level']}\n<:AAblank:926416287054323773> Path: {xp[1]['path'] if 'path' in xp[1] else 'Freeloader' if xp[1]['level'] >= 10 else 'None'}\n<:AAblank:926416287054323773> Total Exp: {xp[1]['xp']}",
+                value=f"{f'#{pos}' if pos > 3 else ':first_place:' if pos == 1 else ':second_place:' if pos == 2 else ':third_place:'} <:pinkdot:913881657994543184> {xp[0]}**\n<:AAblank:926416287054323773> Level {xp[1]['level']}\n<:AAblank:926416287054323773> Path: {xp[1]['path'] if 'path' in xp[1] else 'Freeloader' if xp[1]['level'] >= 10 else 'None'}\n<:AAblank:926416287054323773> Total Exp: {xp[1]['xp']}",
                 inline=False,
             )
 
@@ -484,7 +487,7 @@ class Experience(commands.Cog):
 
             weeklyLeaderBoardEmbed.add_field(
                 name="\u200b",
-                value=f"**#{pos} <:pinkdot:913881657994543184> {xp[0]}**\n<:AAblank:926416287054323773> Exp: {xp[1]}",
+                value=f"**{f'#{pos}' if pos > 3 else ':first_place:' if pos == 1 else ':second_place:' if pos == 2 else ':third_place:'} <:pinkdot:913881657994543184> {xp[0]}**\n<:AAblank:926416287054323773> Exp: {xp[1]}",
                 inline=False,
             )
 

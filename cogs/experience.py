@@ -453,7 +453,7 @@ class Experience(commands.Cog):
 
             leaderBoardEmbed.add_field(
                 name="\u200b",
-                value=f"{f'#{pos}' if pos > 3 else ':first_place:' if pos == 1 else ':second_place:' if pos == 2 else ':third_place:'} <:pinkdot:913881657994543184> {xp[0]}**\n<:AAblank:926416287054323773> Level {xp[1]['level']}\n<:AAblank:926416287054323773> Path: {xp[1]['path'] if 'path' in xp[1] else 'Freeloader' if xp[1]['level'] >= 10 else 'None'}\n<:AAblank:926416287054323773> Total Exp: {xp[1]['xp']}",
+                value=f"**{f'#{pos}' if pos > 3 else ':first_place:' if pos == 1 else ':second_place:' if pos == 2 else ':third_place:'} <:pinkdot:913881657994543184> {xp[0]}**\n<:AAblank:926416287054323773> Level {xp[1]['level']}\n<:AAblank:926416287054323773> Path: {xp[1]['path'] if 'path' in xp[1] else 'Freeloader' if xp[1]['level'] >= 10 else 'None'}\n<:AAblank:926416287054323773> Total Exp: {xp[1]['xp']}",
                 inline=False,
             )
 

@@ -495,16 +495,16 @@ class Experience(commands.Cog):
 
     @tasks.loop(minutes=10)
     async def resetWeeklyLeaderboard(self):
-        if int(time.time()) - self.weeklyLeaderboard["lastTime"] >= 604800:
+        while int(time.time()) - self.weeklyLeaderboard["lastTime"] >= 604800:
 
             print("Resetting weekly leaderboard")
 
-            self.weeklyLeaderboard["lastTime"] = int(time.time())
+            self.weeklyLeaderboard["lastTime"] += 604800
             self.weeklyLeaderboard["leaderboard"] = {}
 
-            with open("database/weeklyLeaderboard.json", "w") as f1:
+        with open("database/weeklyLeaderboard.json", "w") as f1:
 
-                json.dump(self.weeklyLeaderboard, f1, indent=2)
+            json.dump(self.weeklyLeaderboard, f1, indent=2)
 
     @resetWeeklyLeaderboard.before_loop
     async def beforeReset(self):

@@ -173,7 +173,7 @@ class Experience(commands.Cog):
                     colour=0xE7841B,
                 )
                 .set_footer(text="Mystical Forest")
-                .set_thumbnail(url=user.avatar_url)
+                .set_thumbnail(url=user.avatar.url)
             )
 
             await user.add_roles(*rolesToAdd)
@@ -421,7 +421,7 @@ class Experience(commands.Cog):
                 value=f"{userXP['path'] if 'path' in userXP else 'Freeloader' if userXP['level'] >= 10 else 'None'}",
             )
             .set_footer(text="Mystical Forest")
-            .set_thumbnail(url=user.avatar_url)
+            .set_thumbnail(url=user.avatar.url)
         )
 
         await ctx.send(embed=rankEmbed)
@@ -444,7 +444,7 @@ class Experience(commands.Cog):
         leaderBoardEmbed = (
             discord.Embed(title="Leaderboard", colour=0xE7841B)
             .set_footer(text="Mystical Forest")
-            .set_thumbnail(url=ctx.guild.icon_url)
+            .set_thumbnail(url=ctx.guild.icon.url)
         )
 
         for pos, xp in mappedLeaderboardXP:
@@ -478,7 +478,7 @@ class Experience(commands.Cog):
         weeklyLeaderBoardEmbed = (
             discord.Embed(title="Weekly Leaderboard", colour=0xE7841B)
             .set_footer(text="Mystical Forest")
-            .set_thumbnail(url=ctx.guild.icon_url)
+            .set_thumbnail(url=ctx.guild.icon.url)
         )
 
         for pos, xp in mappedWeeklyLeaderboardXP:
@@ -520,5 +520,5 @@ class Experience(commands.Cog):
         await ctx.send(f"Added {xp} experience to {user.mention}!")
 
 
-def setup(bot):
-    bot.add_cog(Experience(bot))
+async def setup(bot):
+    await bot.add_cog(Experience(bot))

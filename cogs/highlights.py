@@ -92,5 +92,5 @@ class Highlights(commands.Cog):
         await ctx.reply("Highlight removed successfully")
 
 
-def setup(bot):
-    bot.add_cog(Highlights(bot))
+async def setup(bot):
+    await bot.add_cog(Highlights(bot))

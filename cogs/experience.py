@@ -199,6 +199,9 @@ class Experience(commands.Cog):
 
     @commands.Cog.listener()
     async def on_ready(self):
+
+        print("ON READY EXPERIENCE")
+
         with open("database/experience.json", "r") as f:
             self.experience = json.load(f)
 
@@ -495,6 +498,10 @@ class Experience(commands.Cog):
 
     @tasks.loop(minutes=10)
     async def resetWeeklyLeaderboard(self):
+
+        if not self.isInitialised:
+            return
+
         while int(time.time()) - self.weeklyLeaderboard["lastTime"] >= 604800:
 
             print("Resetting weekly leaderboard")

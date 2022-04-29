@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
 
 from discord.ext import commands
+from discord import app_commands
 import discord
+
+from constants import MY_GUILD
 
 
 class Triggers(commands.Cog):
@@ -10,8 +13,12 @@ class Triggers(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command()
+    @commands.hybrid_command()
     async def flowers(self, ctx):
+        '''
+        Makes a flower line,
+        Can be used as an ending
+        '''
         await ctx.send("<a:flowers:922167600438444112>" * 16)
         await ctx.message.delete()
 

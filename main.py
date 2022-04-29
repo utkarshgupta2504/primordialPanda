@@ -17,7 +17,14 @@ intents = discord.Intents.default()
 intents.members = True
 intents.message_content = True
 
-bot = commands.Bot(command_prefix="?", intents=intents, case_insensitive=True)
+
+class MyBot(commands.Bot):
+    async def setup_hook(self):
+        for i in next(os.walk(os.getcwd() + "/cogs"), (None, None, []))[2][::-1]:
+            await bot.load_extension("cogs." + i[:-3])
+
+
+bot = MyBot(command_prefix="?", intents=intents, case_insensitive=True)
 
 
 @bot.event
@@ -164,10 +171,12 @@ async def on_command_error(ctx: commands.Context, exc: Exception):
     await send_to_owner(lines)
 
 
-async def main():
+@bot.command()
+async def syncCommands(ctx):
+    await bot.tree.sync()
 
-    for i in next(os.walk(os.getcwd() + "/cogs"), (None, None, []))[2][::-1]:
-        await bot.load_extension("cogs." + i[:-3])
+
+async def main():
 
     async with bot:
         await bot.start(os.getenv("BOT_TOKEN"))

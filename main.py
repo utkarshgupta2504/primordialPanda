@@ -1,5 +1,5 @@
+import asyncio
 from discord.ext import commands
-from discord.enums import TeamMembershipState
 import io
 import traceback
 import aiohttp
@@ -15,12 +15,16 @@ sys.path.append(os.getcwd())
 
 intents = discord.Intents.default()
 intents.members = True
+intents.message_content = True
 
 
-bot = commands.Bot(command_prefix="?", intents=intents, case_insensitive=True)
+class MyBot(commands.Bot):
+    async def setup_hook(self):
+        for i in next(os.walk(os.getcwd() + "/cogs"), (None, None, []))[2][::-1]:
+            await bot.load_extension("cogs." + i[:-3])
 
-for i in next(os.walk(os.getcwd() + "/cogs"), (None, None, []))[2][::-1]:
-    bot.load_extension("cogs." + i[:-3])
+
+bot = MyBot(command_prefix="?", intents=intents, case_insensitive=True)
 
 
 @bot.event
@@ -167,4 +171,15 @@ async def on_command_error(ctx: commands.Context, exc: Exception):
     await send_to_owner(lines)
 
 
-bot.run(os.environ["BOT_TOKEN"])
+@bot.command()
+async def syncCommands(ctx):
+    await bot.tree.sync()
+    await ctx.reply("Commands synced")
+
+
+async def main():
+
+    async with bot:
+        await bot.start(os.getenv("BOT_TOKEN"))
+
+asyncio.run(main())

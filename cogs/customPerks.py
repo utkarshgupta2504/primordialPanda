@@ -67,7 +67,8 @@ class CustomPerks(commands.Cog):
                     send_messages=False,
                 )
 
-                self.customChannels.pop(str(self.channelsToBeDeleted[i]["user"]))
+                self.customChannels.pop(
+                    str(self.channelsToBeDeleted[i]["user"]))
 
                 self.channelsToBeDeleted.pop(i)
 
@@ -322,7 +323,8 @@ class CustomPerks(commands.Cog):
             await theMoorsCategory.create_text_channel(name)
         )
 
-        perms: discord.PermissionOverwrite = createdChannel.overwrites_for(user)
+        perms: discord.PermissionOverwrite = createdChannel.overwrites_for(
+            user)
         perms.manage_messages = True
         perms.manage_channels = True
 
@@ -369,7 +371,8 @@ class CustomPerks(commands.Cog):
             await theMoorsCategory.create_text_channel(name)
         )
 
-        perms: discord.PermissionOverwrite = createdChannel.overwrites_for(user)
+        perms: discord.PermissionOverwrite = createdChannel.overwrites_for(
+            user)
         perms.manage_messages = True
         perms.manage_channels = True
 
@@ -481,5 +484,5 @@ class CustomPerks(commands.Cog):
         await sentMessage.edit(content="Channel revived as booster successfully!")
 
 
-def setup(bot):
-    bot.add_cog(CustomPerks(bot))
+async def setup(bot):
+    await bot.add_cog(CustomPerks(bot))

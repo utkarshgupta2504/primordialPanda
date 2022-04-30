@@ -1,5 +1,7 @@
 from os import environ
 
+import discord
+
 
 levelsDict = {
     0: 0,
@@ -262,3 +264,5 @@ dormID = {
 }
 
 isTesting = environ["BOT_ENV"] == "development"
+
+MY_GUILD = discord.Object(id=911016512574341140)

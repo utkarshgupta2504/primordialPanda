@@ -2,11 +2,11 @@
 
 import asyncio
 from os import environ
-from discord import colour
+from discord import colour, app_commands
 from discord.ext import commands, tasks
 from discord.utils import get
 import discord
-import typing
+from typing import Literal, Optional
 import json
 import time
 
@@ -27,7 +27,7 @@ class Experience(commands.Cog):
 
         self.resetWeeklyLeaderboard.start()
 
-    def get_ratelimit(self, message: discord.Message) -> typing.Optional[int]:
+    def get_ratelimit(self, message: discord.Message) -> Optional[int]:
         """Returns the ratelimit left"""
         bucket = self._cd.get_bucket(message)
         return bucket.update_rate_limit()
@@ -173,7 +173,7 @@ class Experience(commands.Cog):
                     colour=0xE7841B,
                 )
                 .set_footer(text="Mystical Forest")
-                .set_thumbnail(url=user.avatar_url)
+                .set_thumbnail(url=user.avatar.url)
             )
 
             await user.add_roles(*rolesToAdd)
@@ -199,6 +199,9 @@ class Experience(commands.Cog):
 
     @commands.Cog.listener()
     async def on_ready(self):
+
+        print("ON READY EXPERIENCE")
+
         with open("database/experience.json", "r") as f:
             self.experience = json.load(f)
 
@@ -221,8 +224,9 @@ class Experience(commands.Cog):
                 await self.updateUserExperience(str(message.author.id))
                 await self.checkUserLevelUp(message)
 
-    @commands.command(name="choosePath")
-    async def choosePath(self, ctx: commands.Context, path: str = None):
+    @app_commands.command(name="choose-path", description="Choose a Guardian path to follow")
+    @app_commands.guild_only()
+    async def choosePath(self, ctx: commands.Context, path: Literal["Overseer", "Architect", "Ranger", "Hermit", "Caregiver"]):
 
         if self.experience[str(ctx.author.id)]["level"] < 10:
             await ctx.reply(
@@ -360,7 +364,8 @@ class Experience(commands.Cog):
 
         await ctx.message.delete()
 
-    @commands.command(name="rank", aliases=["level", "r", "lvl"])
+    @commands.hybrid_command(name="rank", aliases=["level", "r", "lvl"])
+    @app_commands.guild_only()
     async def rank(self, ctx: commands.Context, user: discord.Member = None):
 
         if user is None:
@@ -421,7 +426,7 @@ class Experience(commands.Cog):
                 value=f"{userXP['path'] if 'path' in userXP else 'Freeloader' if userXP['level'] >= 10 else 'None'}",
             )
             .set_footer(text="Mystical Forest")
-            .set_thumbnail(url=user.avatar_url)
+            .set_thumbnail(url=user.avatar.url)
         )
 
         await ctx.send(embed=rankEmbed)
@@ -444,7 +449,7 @@ class Experience(commands.Cog):
         leaderBoardEmbed = (
             discord.Embed(title="Leaderboard", colour=0xE7841B)
             .set_footer(text="Mystical Forest")
-            .set_thumbnail(url=ctx.guild.icon_url)
+            .set_thumbnail(url=ctx.guild.icon.url)
         )
 
         for pos, xp in mappedLeaderboardXP:
@@ -478,7 +483,7 @@ class Experience(commands.Cog):
         weeklyLeaderBoardEmbed = (
             discord.Embed(title="Weekly Leaderboard", colour=0xE7841B)
             .set_footer(text="Mystical Forest")
-            .set_thumbnail(url=ctx.guild.icon_url)
+            .set_thumbnail(url=ctx.guild.icon.url)
         )
 
         for pos, xp in mappedWeeklyLeaderboardXP:
@@ -495,23 +500,28 @@ class Experience(commands.Cog):
 
     @tasks.loop(minutes=10)
     async def resetWeeklyLeaderboard(self):
-        if int(time.time()) - self.weeklyLeaderboard["lastTime"] >= 604800:
+
+        if not self.isInitialised:
+            return
+
+        while int(time.time()) - self.weeklyLeaderboard["lastTime"] >= 604800:
 
             print("Resetting weekly leaderboard")
 
-            self.weeklyLeaderboard["lastTime"] = int(time.time())
+            self.weeklyLeaderboard["lastTime"] += 604800
             self.weeklyLeaderboard["leaderboard"] = {}
 
-            with open("database/weeklyLeaderboard.json", "w") as f1:
+        with open("database/weeklyLeaderboard.json", "w") as f1:
 
-                json.dump(self.weeklyLeaderboard, f1, indent=2)
+            json.dump(self.weeklyLeaderboard, f1, indent=2)
 
     @resetWeeklyLeaderboard.before_loop
     async def beforeReset(self):
         await self.bot.wait_until_ready()
 
-    @commands.command(name="addXP", aliases=["giveXP"])
+    @commands.hybrid_command(name="addxp", aliases=["giveXP"])
     @commands.has_any_role("Shrine Priestess", "Red Panda Priest")
+    @app_commands.guild_only()
     async def addXP(self, ctx, user: discord.Member, xp: int):
 
         await self.updateUserExperience(str(user.id), xp)
@@ -520,5 +530,5 @@ class Experience(commands.Cog):
         await ctx.send(f"Added {xp} experience to {user.mention}!")
 
 
-def setup(bot):
-    bot.add_cog(Experience(bot))
+async def setup(bot):
+    await bot.add_cog(Experience(bot))

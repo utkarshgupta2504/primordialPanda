@@ -2,7 +2,7 @@
 
 import asyncio
 from os import environ
-from discord import colour
+from discord import colour, app_commands
 from discord.ext import commands, tasks
 from discord.utils import get
 import discord
@@ -224,7 +224,8 @@ class Experience(commands.Cog):
                 await self.updateUserExperience(str(message.author.id))
                 await self.checkUserLevelUp(message)
 
-    @commands.command(name="choosePath")
+    @commands.hybrid_command(name="choosepath")
+    @app_commands.guild_only()
     async def choosePath(self, ctx: commands.Context, path: str = None):
 
         if self.experience[str(ctx.author.id)]["level"] < 10:
@@ -363,7 +364,8 @@ class Experience(commands.Cog):
 
         await ctx.message.delete()
 
-    @commands.command(name="rank", aliases=["level", "r", "lvl"])
+    @commands.hybrid_command(name="rank", aliases=["level", "r", "lvl"])
+    @app_commands.guild_only()
     async def rank(self, ctx: commands.Context, user: discord.Member = None):
 
         if user is None:
@@ -517,8 +519,9 @@ class Experience(commands.Cog):
     async def beforeReset(self):
         await self.bot.wait_until_ready()
 
-    @commands.command(name="addXP", aliases=["giveXP"])
+    @commands.hybrid_command(name="addxp", aliases=["giveXP"])
     @commands.has_any_role("Shrine Priestess", "Red Panda Priest")
+    @app_commands.guild_only()
     async def addXP(self, ctx, user: discord.Member, xp: int):
 
         await self.updateUserExperience(str(user.id), xp)

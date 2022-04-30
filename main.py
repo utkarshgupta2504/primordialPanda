@@ -174,6 +174,7 @@ async def on_command_error(ctx: commands.Context, exc: Exception):
 @bot.command()
 async def syncCommands(ctx):
     await bot.tree.sync()
+    await ctx.reply("Commands synced")
 
 
 async def main():

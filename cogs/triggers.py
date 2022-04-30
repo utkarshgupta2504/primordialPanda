@@ -14,6 +14,7 @@ class Triggers(commands.Cog):
         self.bot = bot
 
     @commands.hybrid_command()
+    @app_commands.guild_only()
     async def flowers(self, ctx):
         '''
         Makes a flower line,
@@ -22,7 +23,8 @@ class Triggers(commands.Cog):
         await ctx.send("<a:flowers:922167600438444112>" * 16)
         await ctx.message.delete()
 
-    @commands.command()
+    @commands.hybrid_command()
+    @app_commands.guild_only()
     async def catline(self, ctx):
         await ctx.send(
             "<:catLine1:922141508029804564>"
@@ -31,7 +33,8 @@ class Triggers(commands.Cog):
         )
         await ctx.message.delete()
 
-    @commands.command()
+    @commands.hybrid_command()
+    @app_commands.guild_only()
     async def line(self, ctx):
         await ctx.send("<a:rainbowLine:922163822549168148>" * 16)
         await ctx.message.delete()

@@ -6,7 +6,7 @@ from discord import colour, app_commands
 from discord.ext import commands, tasks
 from discord.utils import get
 import discord
-import typing
+from typing import Literal, Optional
 import json
 import time
 
@@ -27,7 +27,7 @@ class Experience(commands.Cog):
 
         self.resetWeeklyLeaderboard.start()
 
-    def get_ratelimit(self, message: discord.Message) -> typing.Optional[int]:
+    def get_ratelimit(self, message: discord.Message) -> Optional[int]:
         """Returns the ratelimit left"""
         bucket = self._cd.get_bucket(message)
         return bucket.update_rate_limit()
@@ -226,7 +226,7 @@ class Experience(commands.Cog):
 
     @commands.hybrid_command(name="choosepath")
     @app_commands.guild_only()
-    async def choosePath(self, ctx: commands.Context, path: str = None):
+    async def choosePath(self, ctx: commands.Context, path: Literal["Overseer", "Architect", "Ranger", "Hermit", "Caregiver"] = None):
 
         if self.experience[str(ctx.author.id)]["level"] < 10:
             await ctx.reply(

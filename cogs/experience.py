@@ -224,9 +224,9 @@ class Experience(commands.Cog):
                 await self.updateUserExperience(str(message.author.id))
                 await self.checkUserLevelUp(message)
 
-    @commands.hybrid_command(name="choosepath")
+    @app_commands.command(name="choose-path", description="Choose a Guardian path to follow")
     @app_commands.guild_only()
-    async def choosePath(self, ctx: commands.Context, path: Literal["Overseer", "Architect", "Ranger", "Hermit", "Caregiver"] = None):
+    async def choosePath(self, ctx: commands.Context, path: Literal["Overseer", "Architect", "Ranger", "Hermit", "Caregiver"]):
 
         if self.experience[str(ctx.author.id)]["level"] < 10:
             await ctx.reply(

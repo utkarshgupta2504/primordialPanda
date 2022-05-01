@@ -2,7 +2,7 @@
 
 import asyncio
 from os import environ
-from discord import colour, app_commands
+from discord import Interaction, colour, app_commands
 from discord.ext import commands, tasks
 from discord.utils import get
 import discord
@@ -226,22 +226,22 @@ class Experience(commands.Cog):
 
     @app_commands.command(name="choose-path", description="Choose a Guardian path to follow")
     @app_commands.guild_only()
-    async def choosePath(self, ctx: commands.Context, path: Literal["Overseer", "Architect", "Ranger", "Hermit", "Caregiver"]):
+    async def choosePath(self, ctx: Interaction, path: Literal["Overseer", "Architect", "Ranger", "Hermit", "Caregiver"]):
 
-        if self.experience[str(ctx.author.id)]["level"] < 10:
+        if self.experience[str(ctx.user.id)]["level"] < 10:
             await ctx.reply(
                 "You're still looking a little green, come see me at level 10"
             )
             return
 
-        if ctx.guild.get_role(923622800508465303) not in ctx.author.roles:
-            await ctx.send(
-                f"{ctx.author.mention}, you are already on the **Path of the {self.experience[str(ctx.author.id)]['path']}**, this choice is __permanent__"
+        if ctx.guild.get_role(923622800508465303) not in ctx.user.roles:
+            await ctx.message.reply(
+                f"{ctx.user.mention}, you are already on the **Path of the {self.experience[str(ctx.author.id)]['path']}**, this choice is __permanent__"
             )
             return
 
         if not isTesting and ctx.channel.id != 923646299797078096:
-            await ctx.reply(
+            await ctx.message.reply(
                 f".. but there is no one here, please see me in {self.bot.get_channel(923646299797078096).mention}"
             )
             return
@@ -253,7 +253,7 @@ class Experience(commands.Cog):
             "caregiver",
             "ranger",
         ]:
-            await ctx.reply(
+            await ctx.message.reply(
                 "That is not a proper path, please select from Overseer | Architect | Hermit | Caregiver | Ranger"
             )
             return
@@ -272,7 +272,7 @@ class Experience(commands.Cog):
                 ctx,
             )
 
-            self.experience[str(ctx.author.id)]["path"] = "Overseer"
+            self.experience[str(ctx.user.id)]["path"] = "Overseer"
 
         elif path == "architect":
 
@@ -285,7 +285,7 @@ class Experience(commands.Cog):
                 ctx,
             )
 
-            self.experience[str(ctx.author.id)]["path"] = "Architect"
+            self.experience[str(ctx.user.id)]["path"] = "Architect"
 
         elif path == "hermit":
 
@@ -298,7 +298,7 @@ class Experience(commands.Cog):
                 ctx,
             )
 
-            self.experience[str(ctx.author.id)]["path"] = "Hermit"
+            self.experience[str(ctx.user.id)]["path"] = "Hermit"
 
         elif path == "ranger":
 
@@ -311,7 +311,7 @@ class Experience(commands.Cog):
                 ctx,
             )
 
-            self.experience[str(ctx.author.id)]["path"] = "Ranger"
+            self.experience[str(ctx.user.id)]["path"] = "Ranger"
 
         elif path == "caregiver":
 
@@ -324,15 +324,15 @@ class Experience(commands.Cog):
                 ctx,
             )
 
-            self.experience[str(ctx.author.id)]["path"] = "Caregiver"
+            self.experience[str(ctx.user.id)]["path"] = "Caregiver"
 
         response = f"You have successfully chosen the path of the {path.capitalize()}"
 
         if currLevel > 19:
             response += "\nBecause you chose your path at a later stage, the primordial panda takes away your experience to start at the begin of the path you've chosen to follow."
 
-            self.experience[str(ctx.author.id)]["xp"] = 6515
-            self.experience[str(ctx.author.id)]["level"] = 19
+            self.experience[str(ctx.user.id)]["xp"] = 6515
+            self.experience[str(ctx.user.id)]["level"] = 19
 
         with open("database/experience.json", "w") as f:
 
@@ -341,26 +341,26 @@ class Experience(commands.Cog):
         await self.bot.get_channel(
             926455957737852988 if isTesting else 925821155019980830
         ).send(
-            f"{ctx.author.mention} has chosen to walk along the **Path of the {path.capitalize()}**"
+            f"{ctx.user.mention} has chosen to walk along the **Path of the {path.capitalize()}**"
         )
 
         await self.bot.get_channel(
             926455957737852988 if isTesting else 923016846863634442
         ).send(
-            f"{ctx.author.mention} now walks the **Path of the {path.capitalize()}**"
+            f"{ctx.user.mention} now walks the **Path of the {path.capitalize()}**"
         )
 
         await self.bot.get_channel(
             926455957737852988 if isTesting else dormID[path.capitalize()]
         ).send(
-            f"{ctx.author.mention} has joined our superior path, <@&{pathLevelRoles[path.capitalize()][0]}>, come welcome them!"
+            f"{ctx.user.mention} has joined our superior path, <@&{pathLevelRoles[path.capitalize()][0]}>, come welcome them!"
         )
 
-        await ctx.reply(response, delete_after=5)
+        await ctx.message.reply(response, delete_after=5)
 
         await asyncio.sleep(5)
 
-        await ctx.author.remove_roles(ctx.guild.get_role(923622800508465303))
+        await ctx.user.remove_roles(ctx.guild.get_role(923622800508465303))
 
         await ctx.message.delete()
 

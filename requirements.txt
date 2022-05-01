@@ -1,5 +1,5 @@
 aiohttp==3.7.4.post0
-discord.py==git+https://github.com/Rapptz/discord.py
+git+https://github.com/Rapptz/discord.py@master
 emoji==1.6.3
 python-dotenv==0.20.0
 pytimeparse==1.1.8

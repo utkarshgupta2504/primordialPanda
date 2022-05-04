@@ -191,11 +191,11 @@ class Experience(commands.Cog):
             else:
                 await self.bot.get_channel(926136930066911314).send(embed=levelUpEmbed)
 
-    async def addPathRoles(self, level, roles, ctx: commands.Context):
+    async def addPathRoles(self, level, roles, interaction: discord.Interaction):
 
         for lvl in roles:
             if level >= lvl:
-                await ctx.author.add_roles(ctx.guild.get_role(roles[lvl]))
+                await interaction.user.add_roles(interaction.guild.get_role(roles[lvl]))
 
     @commands.Cog.listener()
     async def on_ready(self):
@@ -226,24 +226,20 @@ class Experience(commands.Cog):
 
     @app_commands.command(name="choose-path", description="Choose a Guardian path to follow")
     @app_commands.guild_only()
-    async def choosePath(self, ctx: Interaction, path: Literal["Overseer", "Architect", "Ranger", "Hermit", "Caregiver"]):
+    async def choosePath(self, interaction: Interaction, path: Literal["Overseer", "Architect", "Ranger", "Hermit", "Caregiver"]):
 
-        if self.experience[str(ctx.user.id)]["level"] < 10:
-            await ctx.reply(
-                "You're still looking a little green, come see me at level 10"
-            )
+        if self.experience[str(interaction.user.id)]["level"] < 10:
+            await interaction.response.send_message(content="You're still looking a little green, come see me at level 10")
             return
 
-        if ctx.guild.get_role(923622800508465303) not in ctx.user.roles:
-            await ctx.message.reply(
-                f"{ctx.user.mention}, you are already on the **Path of the {self.experience[str(ctx.author.id)]['path']}**, this choice is __permanent__"
-            )
+        if interaction.guild.get_role(923622800508465303) not in interaction.user.roles:
+            await interaction.response.send_message(content=f"{interaction.user.mention}, you are already on the **Path of the {self.experience[str(interaction.user.id)]['path']}**, this choice is __permanent__"
+                                                    )
             return
 
-        if not isTesting and ctx.channel.id != 923646299797078096:
-            await ctx.message.reply(
-                f".. but there is no one here, please see me in {self.bot.get_channel(923646299797078096).mention}"
-            )
+        if not isTesting and interaction.channel.id != 923646299797078096:
+            await interaction.response.send_message(content=f".. but there is no one here, please see me in {self.bot.get_channel(923646299797078096).mention}"
+                                                    )
             return
 
         if path is None or path.lower() not in [
@@ -253,13 +249,12 @@ class Experience(commands.Cog):
             "caregiver",
             "ranger",
         ]:
-            await ctx.message.reply(
-                "That is not a proper path, please select from Overseer | Architect | Hermit | Caregiver | Ranger"
-            )
+            await interaction.response.send_message(content="That is not a proper path, please select from Overseer | Architect | Hermit | Caregiver | Ranger"
+                                                    )
             return
 
         path = path.lower()
-        currLevel = self.experience[str(ctx.author.id)]["level"]
+        currLevel = self.experience[str(interaction.user.id)]["level"]
 
         if path == "overseer":
 
@@ -269,10 +264,10 @@ class Experience(commands.Cog):
                     0: 923624607091658803,  # Path of The Overseer
                     1: 923999016218406942,  # Apprentice of the Overseer
                 },
-                ctx,
+                interaction,
             )
 
-            self.experience[str(ctx.user.id)]["path"] = "Overseer"
+            self.experience[str(interaction.user.id)]["path"] = "Overseer"
 
         elif path == "architect":
 
@@ -282,10 +277,10 @@ class Experience(commands.Cog):
                     0: 923635122840940625,  # Path of The Architect
                     1: 924008140205338664,  # Apprentice of the Architect
                 },
-                ctx,
+                interaction,
             )
 
-            self.experience[str(ctx.user.id)]["path"] = "Architect"
+            self.experience[str(interaction.user.id)]["path"] = "Architect"
 
         elif path == "hermit":
 
@@ -295,10 +290,10 @@ class Experience(commands.Cog):
                     0: 923626226906701845,  # Path of The Hermit
                     1: 924010222517891092,  # Apprentice of the Hermit
                 },
-                ctx,
+                interaction,
             )
 
-            self.experience[str(ctx.user.id)]["path"] = "Hermit"
+            self.experience[str(interaction.user.id)]["path"] = "Hermit"
 
         elif path == "ranger":
 
@@ -308,10 +303,10 @@ class Experience(commands.Cog):
                     0: 923633643761594459,  # Path of The Ranger
                     1: 924009432344567848,  # Apprentice of the Ranger
                 },
-                ctx,
+                interaction,
             )
 
-            self.experience[str(ctx.user.id)]["path"] = "Ranger"
+            self.experience[str(interaction.user.id)]["path"] = "Ranger"
 
         elif path == "caregiver":
 
@@ -321,18 +316,18 @@ class Experience(commands.Cog):
                     0: 923633634160836619,  # Path of The Caregiver
                     1: 924006409102827552,  # Apprentice of the Caregiver
                 },
-                ctx,
+                interaction,
             )
 
-            self.experience[str(ctx.user.id)]["path"] = "Caregiver"
+            self.experience[str(interaction.user.id)]["path"] = "Caregiver"
 
         response = f"You have successfully chosen the path of the {path.capitalize()}"
 
         if currLevel > 19:
             response += "\nBecause you chose your path at a later stage, the primordial panda takes away your experience to start at the begin of the path you've chosen to follow."
 
-            self.experience[str(ctx.user.id)]["xp"] = 6515
-            self.experience[str(ctx.user.id)]["level"] = 19
+            self.experience[str(interaction.user.id)]["xp"] = 6515
+            self.experience[str(interaction.user.id)]["level"] = 19
 
         with open("database/experience.json", "w") as f:
 
@@ -341,28 +336,28 @@ class Experience(commands.Cog):
         await self.bot.get_channel(
             926455957737852988 if isTesting else 925821155019980830
         ).send(
-            f"{ctx.user.mention} has chosen to walk along the **Path of the {path.capitalize()}**"
+            f"{interaction.user.mention} has chosen to walk along the **Path of the {path.capitalize()}**"
         )
 
         await self.bot.get_channel(
             926455957737852988 if isTesting else 923016846863634442
         ).send(
-            f"{ctx.user.mention} now walks the **Path of the {path.capitalize()}**"
+            f"{interaction.user.mention} now walks the **Path of the {path.capitalize()}**"
         )
 
         await self.bot.get_channel(
             926455957737852988 if isTesting else dormID[path.capitalize()]
         ).send(
-            f"{ctx.user.mention} has joined our superior path, <@&{pathLevelRoles[path.capitalize()][0]}>, come welcome them!"
+            f"{interaction.user.mention} has joined our superior path, <@&{pathLevelRoles[path.capitalize()][0]}>, come welcome them!"
         )
 
-        await ctx.message.reply(response, delete_after=5)
+        await interaction.response.send_message(content=response, delete_after=5)
 
         await asyncio.sleep(5)
 
-        await ctx.user.remove_roles(ctx.guild.get_role(923622800508465303))
+        await interaction.user.remove_roles(interaction.guild.get_role(923622800508465303))
 
-        await ctx.message.delete()
+        await interaction.message.delete()
 
     @commands.hybrid_command(name="rank", aliases=["level", "r", "lvl"])
     @app_commands.guild_only()

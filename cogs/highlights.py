@@ -5,7 +5,7 @@ import os
 from discord.ext import commands
 import discord
 
-from constants import isTesting
+from utils.constants import isTesting
 
 
 class Highlights(commands.Cog):

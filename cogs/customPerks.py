@@ -5,7 +5,7 @@ from discord.ext import commands, tasks
 import discord
 import json
 import emoji
-from constants import isTesting
+from utils.constants import isTesting
 import time
 
 from discord.utils import get

@@ -10,7 +10,7 @@ from typing import Literal, Optional
 import json
 import time
 
-from constants import *
+from utils.constants import *
 
 
 class Experience(commands.Cog):

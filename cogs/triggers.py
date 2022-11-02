@@ -4,7 +4,7 @@ from discord.ext import commands
 from discord import app_commands
 import discord
 
-from constants import MY_GUILD
+from utils.constants import MY_GUILD
 
 
 class Triggers(commands.Cog):

@@ -9,7 +9,8 @@ import discord
 from dotenv import load_dotenv
 load_dotenv()
 
-from constants import *
+from utils.constants import *
+from utils.config import checkFiles
 
 sys.path.append(os.getcwd())
 
@@ -20,6 +21,7 @@ intents.message_content = True
 
 class MyBot(commands.Bot):
     async def setup_hook(self):
+        checkFiles()
         for i in next(os.walk(os.getcwd() + "/cogs"), (None, None, []))[2][::-1]:
             await bot.load_extension("cogs." + i[:-3])
 
@@ -84,19 +86,6 @@ async def verify(ctx: commands.Context):
     await bot.get_channel(923016846863634442).send(
         f"A new servant, {ctx.author.mention}, has pledged their loyalty to the Mystical Forest. Join me in welcoming them. <@&923602007649026078>"
     )
-
-
-# @bot.command(name="rename")
-# async def renameEmoji(ctx: commands.Context):
-
-#     sentMessage = await ctx.send("Renaming emojis, please wait...")
-
-#     for emote in ctx.guild.emojis:
-
-#         if emote.name[-3:] != "OwO":
-#             await emote.edit(name=emote.name + "OwO")
-
-#     await sentMessage.edit(content="Rename Successful")
 
 # These exceptions are ignored.
 filter_excs = (commands.CommandNotFound, commands.CheckFailure)

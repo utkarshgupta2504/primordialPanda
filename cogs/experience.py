@@ -24,6 +24,7 @@ class Experience(commands.Cog):
         self.isInitialised = False
         self.experience = {}
         self.weeklyLeaderboard = {}
+        self.config = {}
 
         self.resetWeeklyLeaderboard.start()
 
@@ -39,21 +40,20 @@ class Experience(commands.Cog):
         if id not in self.weeklyLeaderboard["leaderboard"]:
             self.weeklyLeaderboard["leaderboard"][id] = 0
 
+        xp = int(xp * self.config.get("multiplier", 1))
+
         self.experience[id]["xp"] += xp
         self.weeklyLeaderboard["leaderboard"][id] += xp
 
         with open("database/experience.json", "w") as f:
-
             json.dump(self.experience, f, indent=2)
 
             with open("database/weeklyLeaderboard.json", "w") as f1:
-
                 json.dump(self.weeklyLeaderboard, f1, indent=2)
 
     async def checkUserLevelUp(
         self, message: discord.Message, user: discord.Member = None
     ):
-
         if user is None:
             user = message.author
 
@@ -80,8 +80,7 @@ class Experience(commands.Cog):
             isLeveledUp = True
 
             if currLevel == 10:
-                rolesToAdd.append(
-                    get(message.guild.roles, id=923622800508465303))
+                rolesToAdd.append(get(message.guild.roles, id=923622800508465303))
 
                 embedsToSend.append(
                     discord.Embed(
@@ -93,14 +92,11 @@ class Experience(commands.Cog):
                 embedDescription += f"\n\nThe Primordial Panda is pleased with your hard work! You have received, in addition to level 10, the following blessings: participate in giveaways, polls, and can pick your path in the {self.bot.get_channel(923646299797078096).mention} channel!"
 
             if currLevel > 19 and "path" in self.experience[id]:
-
                 if currLevel in pathLevelRoles[self.experience[id]["path"]]:
-
                     rolesToAdd.append(
                         get(
                             message.guild.roles,
-                            id=pathLevelRoles[self.experience[id]
-                                              ["path"]][currLevel],
+                            id=pathLevelRoles[self.experience[id]["path"]][currLevel],
                         )
                     )
 
@@ -160,16 +156,13 @@ class Experience(commands.Cog):
                 embedDescription += f"\n\nThe Primordial Panda is pleased with your hard work! You have received, in addition to level {currLevel}, the following blessings: A custom command!"
 
         if isLeveledUp:
-
             with open("database/experience.json", "w") as f:
-
                 json.dump(self.experience, f, indent=2)
 
             levelUpEmbed = (
                 discord.Embed(
                     title="Level Up!",
-                    description=embedDescription.replace(
-                        "<level>", str(currLevel)),
+                    description=embedDescription.replace("<level>", str(currLevel)),
                     colour=0xE7841B,
                 )
                 .set_footer(text="Mystical Forest")
@@ -192,14 +185,12 @@ class Experience(commands.Cog):
                 await self.bot.get_channel(926136930066911314).send(embed=levelUpEmbed)
 
     async def addPathRoles(self, level, roles, interaction: discord.Interaction):
-
         for lvl in roles:
             if level >= lvl:
                 await interaction.user.add_roles(interaction.guild.get_role(roles[lvl]))
 
     @commands.Cog.listener()
     async def on_ready(self):
-
         print("ON READY EXPERIENCE")
 
         with open("database/experience.json", "r") as f:
@@ -208,11 +199,12 @@ class Experience(commands.Cog):
             with open("database/weeklyLeaderboard.json", "r") as f1:
                 self.weeklyLeaderboard = json.load(f1)
 
-                self.isInitialised = True
+                with open("database/config.json", "r") as f2:
+                    self.config = json.load(f2)
+                    self.isInitialised = True
 
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
-
         if not self.isInitialised:
             print("Experience not initialised")
             return
@@ -224,22 +216,31 @@ class Experience(commands.Cog):
                 await self.updateUserExperience(str(message.author.id))
                 await self.checkUserLevelUp(message)
 
-    @app_commands.command(name="choose-path", description="Choose a Guardian path to follow")
+    @app_commands.command(
+        name="choose-path", description="Choose a Guardian path to follow"
+    )
     @app_commands.guild_only()
-    async def choosePath(self, interaction: Interaction, path: Literal["Overseer", "Architect", "Ranger", "Hermit", "Caregiver"]):
-
+    async def choosePath(
+        self,
+        interaction: Interaction,
+        path: Literal["Overseer", "Architect", "Ranger", "Hermit", "Caregiver"],
+    ):
         if self.experience[str(interaction.user.id)]["level"] < 10:
-            await interaction.response.send_message(content="You're still looking a little green, come see me at level 10")
+            await interaction.response.send_message(
+                content="You're still looking a little green, come see me at level 10"
+            )
             return
 
         if interaction.guild.get_role(923622800508465303) not in interaction.user.roles:
-            await interaction.response.send_message(content=f"{interaction.user.mention}, you are already on the **Path of the {self.experience[str(interaction.user.id)]['path']}**, this choice is __permanent__"
-                                                    )
+            await interaction.response.send_message(
+                content=f"{interaction.user.mention}, you are already on the **Path of the {self.experience[str(interaction.user.id)]['path']}**, this choice is __permanent__"
+            )
             return
 
         if not isTesting and interaction.channel.id != 923646299797078096:
-            await interaction.response.send_message(content=f".. but there is no one here, please see me in {self.bot.get_channel(923646299797078096).mention}"
-                                                    )
+            await interaction.response.send_message(
+                content=f".. but there is no one here, please see me in {self.bot.get_channel(923646299797078096).mention}"
+            )
             return
 
         if path is None or path.lower() not in [
@@ -249,15 +250,15 @@ class Experience(commands.Cog):
             "caregiver",
             "ranger",
         ]:
-            await interaction.response.send_message(content="That is not a proper path, please select from Overseer | Architect | Hermit | Caregiver | Ranger"
-                                                    )
+            await interaction.response.send_message(
+                content="That is not a proper path, please select from Overseer | Architect | Hermit | Caregiver | Ranger"
+            )
             return
 
         path = path.lower()
         currLevel = self.experience[str(interaction.user.id)]["level"]
 
         if path == "overseer":
-
             await self.addPathRoles(
                 currLevel,
                 {
@@ -270,7 +271,6 @@ class Experience(commands.Cog):
             self.experience[str(interaction.user.id)]["path"] = "Overseer"
 
         elif path == "architect":
-
             await self.addPathRoles(
                 currLevel,
                 {
@@ -283,7 +283,6 @@ class Experience(commands.Cog):
             self.experience[str(interaction.user.id)]["path"] = "Architect"
 
         elif path == "hermit":
-
             await self.addPathRoles(
                 currLevel,
                 {
@@ -296,7 +295,6 @@ class Experience(commands.Cog):
             self.experience[str(interaction.user.id)]["path"] = "Hermit"
 
         elif path == "ranger":
-
             await self.addPathRoles(
                 currLevel,
                 {
@@ -309,7 +307,6 @@ class Experience(commands.Cog):
             self.experience[str(interaction.user.id)]["path"] = "Ranger"
 
         elif path == "caregiver":
-
             await self.addPathRoles(
                 currLevel,
                 {
@@ -330,7 +327,6 @@ class Experience(commands.Cog):
             self.experience[str(interaction.user.id)]["level"] = 19
 
         with open("database/experience.json", "w") as f:
-
             json.dump(self.experience, f, indent=2)
 
         await self.bot.get_channel(
@@ -355,14 +351,15 @@ class Experience(commands.Cog):
 
         await asyncio.sleep(5)
 
-        await interaction.user.remove_roles(interaction.guild.get_role(923622800508465303))
+        await interaction.user.remove_roles(
+            interaction.guild.get_role(923622800508465303)
+        )
 
         await interaction.message.delete()
 
     @commands.hybrid_command(name="rank", aliases=["level", "r", "lvl"])
     @app_commands.guild_only()
     async def rank(self, ctx: commands.Context, user: discord.Member = None):
-
         if user is None:
             user = ctx.author
 
@@ -428,7 +425,6 @@ class Experience(commands.Cog):
 
     @commands.group(name="leaderboard", aliases=["lb"], invoke_without_command=True)
     async def leaderboard(self, ctx: commands.Context):
-
         leaderboardXP = sorted(
             self.experience.items(), key=lambda item: item[1]["xp"], reverse=True
         )
@@ -493,21 +489,33 @@ class Experience(commands.Cog):
 
         await ctx.send(embed=weeklyLeaderBoardEmbed)
 
+    @commands.hybrid_command(name="multi", description="Set the XP multiplier")
+    @commands.has_any_role("Shrine Priestess", "Red Panda Priest")
+    @app_commands.guild_only()
+    async def multi(self, ctx: commands.Context, multiplier: float):
+        if multiplier < 1:
+            await ctx.send("Multiplier cannot be less than 1")
+            return
+
+        self.config["multiplier"] = multiplier
+
+        with open("database/config.json", "w") as f:
+            json.dump(self.config, f, indent=2)
+
+        await ctx.send(f"XP multiplier set to {multiplier}")
+
     @tasks.loop(minutes=10)
     async def resetWeeklyLeaderboard(self):
-
         if not self.isInitialised:
             return
 
         while int(time.time()) - self.weeklyLeaderboard["lastTime"] >= 604800:
-
             print("Resetting weekly leaderboard")
 
             self.weeklyLeaderboard["lastTime"] += 604800
             self.weeklyLeaderboard["leaderboard"] = {}
 
         with open("database/weeklyLeaderboard.json", "w") as f1:
-
             json.dump(self.weeklyLeaderboard, f1, indent=2)
 
     @resetWeeklyLeaderboard.before_loop
@@ -518,7 +526,6 @@ class Experience(commands.Cog):
     @commands.has_any_role("Shrine Priestess", "Red Panda Priest")
     @app_commands.guild_only()
     async def addXP(self, ctx, user: discord.Member, xp: int):
-
         await self.updateUserExperience(str(user.id), xp)
         await self.checkUserLevelUp(ctx.message, user)
 

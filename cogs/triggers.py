@@ -20,23 +20,23 @@ class Triggers(commands.Cog):
         Makes a flower line,
         Can be used as an ending
         '''
-        await ctx.send("<a:flowers:922167600438444112>" * 16)
+        await ctx.send("<a:flowers:1100188266201882736>" * 16)
         await ctx.message.delete()
 
     @commands.hybrid_command()
     @app_commands.guild_only()
     async def catline(self, ctx):
         await ctx.send(
-            "<:catLine1:922141508029804564>"
-            + "<:catLine2:922141539289935872>" * 4
-            + "<:catLine3:922141563075833887>"
+            "<:catLine1:1100188277421649990>"
+            + "<:catLine2:1100188286531666063>" * 10
+            + "<:catLine3:1100188296514113658>"
         )
         await ctx.message.delete()
 
     @commands.hybrid_command()
     @app_commands.guild_only()
     async def line(self, ctx):
-        await ctx.send("<a:rainbowLine:922163822549168148>" * 16)
+        await ctx.send("<a:rainbowLine:1100188252515860611>" * 16)
         await ctx.message.delete()
 
 
